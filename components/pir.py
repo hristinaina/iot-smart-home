@@ -1,13 +1,15 @@
 import threading
 from simulators.pir import run_pir_simulator
 import time
+from settings import lock
 
 
 def motion_detected(name):
-    t = time.localtime()
-    print("=" * 10 + name + "=" * 10)
-    print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-    print("{0} detected motion".format(name))
+    with lock:
+        t = time.localtime()
+        print("=" * 10 + name + "=" * 10)
+        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+        print("{0} detected motion".format(name))
 
 
 def run_pir(settings, threads, stop_event):
