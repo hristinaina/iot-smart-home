@@ -25,5 +25,10 @@
     "name": "RPIR2",
     "simulated": true,
     "pin": 3
+  },
+  "DPIR1": {
+    "name": "DPIR1",
+    "simulated": true,
+    "pin": 17
   }
 }

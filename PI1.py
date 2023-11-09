@@ -25,11 +25,13 @@ if __name__ == "__main__":
         uds1_settings = settings['DUS1']
         rpir1_settings = settings['RPIR1']
         rpir2_settings = settings['RPIR2']
+        dpir1_settings = settings['DPIR1']
         run_dht(dht1_settings, threads, stop_event)
         run_dht(dht2_settings, threads, stop_event)
         run_uds(uds1_settings, threads, stop_event)
         run_pir(rpir1_settings, threads, stop_event)
         run_pir(rpir2_settings, threads, stop_event)
+        run_pir(dpir1_settings, threads, stop_event)
         while True:
             time.sleep(1)
 
