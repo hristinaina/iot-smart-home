@@ -1,15 +1,16 @@
 
 import threading
 import time
-
+from settings import lock
 from simulators.uds import run_uds_simulator
 
 
 def uds_callback(distance, name):
-    t = time.localtime()
-    print("=" * 10 + name + "=" * 10)
-    print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-    print(f"Distance: {distance}cm")
+    with lock:
+        t = time.localtime()
+        print("=" * 10 + name + "=" * 10)
+        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+        print(f"Distance: {distance}cm")
 
 
 def run_uds(settings, threads, stop_event):

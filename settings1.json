@@ -15,5 +15,20 @@
     "echo_pin": 23,
     "trig_pin": 24,
     "max_iter": 100
+  },
+  "RPIR1": {
+    "name": "RPIR1",
+    "simulated": true,
+    "pin": 4
+  },
+  "RPIR2": {
+    "name": "RPIR2",
+    "simulated": true,
+    "pin": 3
+  },
+  "DPIR1": {
+    "name": "DPIR1",
+    "simulated": true,
+    "pin": 17
   }
 }

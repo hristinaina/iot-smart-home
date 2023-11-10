@@ -4,6 +4,7 @@ import threading
 from components.uds import run_uds
 from settings import load_settings
 from components.dht import run_dht
+from components.pir import run_pir
 import time
 
 try:
@@ -11,7 +12,6 @@ try:
     GPIO.setmode(GPIO.BCM)
 except:
     pass
-
 
 if __name__ == "__main__":
     print('Starting app')
@@ -22,9 +22,15 @@ if __name__ == "__main__":
         dht1_settings = settings['DHT1']
         dht2_settings = settings['DHT2']
         uds1_settings = settings['DUS1']
+        rpir1_settings = settings['RPIR1']
+        rpir2_settings = settings['RPIR2']
+        dpir1_settings = settings['DPIR1']
         run_dht(dht1_settings, threads, stop_event)
-        run_dht(dht2_settings,threads,stop_event)
-        run_uds(uds1_settings,threads,stop_event)
+        run_dht(dht2_settings, threads, stop_event)
+        run_uds(uds1_settings, threads, stop_event)
+        run_pir(rpir1_settings, threads, stop_event)
+        run_pir(rpir2_settings, threads, stop_event)
+        run_pir(dpir1_settings, threads, stop_event)
         while True:
             time.sleep(1)
 
