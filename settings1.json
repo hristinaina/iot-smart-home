@@ -30,5 +30,10 @@
     "name": "DPIR1",
     "simulated": true,
     "pin": 17
+  },
+  "DS1": {
+    "name": "DS1",
+    "simulated": true,
+    "pin": 27
   }
 }

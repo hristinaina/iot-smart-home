@@ -9,7 +9,7 @@ def motion_detected(name):
         t = time.localtime()
         print("=" * 10 + name + "=" * 10)
         print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print("{0} detected motion".format(name))
+        print("Detected motion")
 
 
 def run_pir(settings, threads, stop_event):
