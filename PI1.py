@@ -1,7 +1,6 @@
 
 import threading
 
-from components.ms import run_ms
 from components.uds import run_uds
 from settings import load_settings
 from components.dht import run_dht
@@ -26,6 +25,7 @@ if __name__ == "__main__":
         rpir1_settings = settings['RPIR1']
         rpir2_settings = settings['RPIR2']
         dpir1_settings = settings['DPIR1']
+        ds1_settings = settings['DS1']
         ms_settings = settings['DMS']
         run_dht(dht1_settings, threads, stop_event)
         run_dht(dht2_settings, threads, stop_event)
@@ -33,6 +33,7 @@ if __name__ == "__main__":
         run_pir(rpir1_settings, threads, stop_event)
         run_pir(rpir2_settings, threads, stop_event)
         run_pir(dpir1_settings, threads, stop_event)
+        run_button(ds1_settings, threads, stop_event)
         run_ms(ms_settings, threads, stop_event)
         while True:
             time.sleep(1)
