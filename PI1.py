@@ -1,6 +1,8 @@
 
 import threading
 
+from components.button import run_button
+from components.ms import run_ms
 from components.uds import run_uds
 from settings import load_settings
 from components.dht import run_dht
