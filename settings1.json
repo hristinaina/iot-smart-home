@@ -48,6 +48,11 @@
     "C3": 20,
     "C4": 21
   },
+  "DB": {
+    "name": "DB",
+    "simulated": true,
+    "pin": 5
+  },
   "DL": {
     "name": "DL",
     "simulated": true,
