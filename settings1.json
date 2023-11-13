@@ -1,0 +1,61 @@
+{
+  "DHT1": {
+    "name": "RDH1",
+    "simulated": true,
+    "pin": 26
+  },
+  "DHT2": {
+    "name": "RDH2",
+    "simulated": true,
+    "pin": 6
+  },
+  "DUS1": {
+    "name": "DUS1",
+    "simulated": true,
+    "echo_pin": 23,
+    "trig_pin": 24,
+    "max_iter": 100
+  },
+  "RPIR1": {
+    "name": "RPIR1",
+    "simulated": true,
+    "pin": 4
+  },
+  "RPIR2": {
+    "name": "RPIR2",
+    "simulated": true,
+    "pin": 3
+  },
+  "DPIR1": {
+    "name": "DPIR1",
+    "simulated": true,
+    "pin": 17
+  },
+  "DS1": {
+    "name": "DS1",
+    "simulated": true,
+    "pin": 27
+  },
+  "DMS": {
+    "name": "DMS",
+    "simulated": true,
+    "R1": 25,
+    "R2": 8,
+    "R3": 7,
+    "R4": 1,
+    "C1": 12,
+    "C2": 16,
+    "C3": 20,
+    "C4": 21
+  },
+  "DB": {
+    "name": "DB",
+    "simulated": true,
+    "pin": 5
+  },
+  "DL": {
+    "name": "DL",
+    "simulated": true,
+    "pin": 22
+  }
+}
