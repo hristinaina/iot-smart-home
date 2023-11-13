@@ -52,5 +52,10 @@
     "name": "DB",
     "simulated": true,
     "pin": 5
+  },
+  "DL": {
+    "name": "DL",
+    "simulated": true,
+    "pin": 22
   }
 }
