@@ -1,6 +1,8 @@
-
+import multiprocessing
 import threading
-
+from components.button import run_button
+from components.light import run_light
+from components.ms import run_ms
 from components.uds import run_uds
 from settings import load_settings
 from components.dht import run_dht
@@ -35,7 +37,13 @@ if __name__ == "__main__":
         run_pir(dpir1_settings, threads, stop_event)
         run_button(ds1_settings, threads, stop_event)
         run_ms(ms_settings, threads, stop_event)
+        pi_light_pipe, light_pipe = multiprocessing.Pipe()
+        run_light(light_pipe, settings['DL'], threads, stop_event)
+
         while True:
+            key = input()
+            if key.strip().lower() == "l":
+               pi_light_pipe.send("l")
             time.sleep(1)
 
     except KeyboardInterrupt:

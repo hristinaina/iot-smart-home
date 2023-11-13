@@ -4,7 +4,7 @@ import random
 keys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "#", "A", "B", "C", "D"]
 
 
-def generate_values(initial_temp=25, initial_humidity=20):
+def generate_values():
     while True:
         length = random.randint(4, 8)
         code = ""
