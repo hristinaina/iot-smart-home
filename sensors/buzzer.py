@@ -10,13 +10,13 @@ class Buzzer:
         GPIO.setup(pin, GPIO.OUT)
 
 
-def run_buzzer_sensor(buzzer, callback_activated, callback_deactivated, delay, stop_event):
-    callback_activated(buzzer.name)
+def run_buzzer_sensor(buzzer, callback_activated, callback_deactivated, delay, stop_event, publish_event, settings):
+    callback_activated(publish_event, settings)
     while True:
         GPIO.output(buzzer.pin, True)
         time.sleep(delay)
         GPIO.output(buzzer.pin, False)
         if stop_event.is_set():
-            callback_deactivated(buzzer.name)
+            callback_deactivated(publish_event, settings)
             break
         time.sleep(delay)

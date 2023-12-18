@@ -16,14 +16,13 @@ class light:
             GPIO.output(self.pin, GPIO.LOW)
 
 
-def run_light_loop(pipe,light, delay, callback, stop_event):
+def run_light_loop(pipe, light, delay, callback, stop_event, publish_event, settings):
     while True:
         message = pipe.recv()
         message = str(message).strip().lower()
         if message == "l":
-            light_state = not light_state
             light.switch_light()
-        callback(light.is_on, light.name)
+        callback(light.is_on, publish_event, settings)
         if stop_event.is_set():
             break
         time.sleep(delay)

@@ -13,11 +13,11 @@ def generate_value(delay, previous_value=False):
             yield new_value
 
 
-def run_button_simulator(delay, callback_pressed, callback_released, stop_event, name):
+def run_button_simulator(delay, callback_pressed, callback_released, stop_event, publish_event, settings):
     for pressed in generate_value(delay):
         if pressed:
-            callback_pressed(name)
+            callback_pressed(publish_event, settings)
         else:
-            callback_released(name)
+            callback_released(publish_event, settings)
         if stop_event.is_set():
             break
