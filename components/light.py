@@ -48,7 +48,8 @@ def light_callback(state, publish_event, dht_settings, verbose=False):
         "simulated": dht_settings['simulated'],
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
-        "value": 1 if state else 0
+        "field_name": dht_settings["field_name"],
+        "value": "on" if state else "off"
     }
 
     with counter_lock:

@@ -46,7 +46,8 @@ def button_pressed(publish_event, dht_settings, verbose=False):
         "simulated": dht_settings['simulated'],
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
-        "value": 1
+        "field_name": dht_settings["field_name"],
+        "value": "pressed"
     }
 
     with counter_lock:
@@ -71,7 +72,8 @@ def button_released(publish_event, dht_settings, verbose=False):
         "simulated": dht_settings['simulated'],
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
-        "value": 0
+        "field_name": dht_settings["field_name"],
+        "value": "released"
     }
 
     with counter_lock:

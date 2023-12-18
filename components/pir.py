@@ -46,7 +46,8 @@ def motion_callback(publish_event, dht_settings, value, verbose=False):
         "simulated": dht_settings['simulated'],
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
-        "value": value
+        "field_name": dht_settings["field_name"],
+        "value": "detected" if value else "not_detected"
     }
 
     with counter_lock:

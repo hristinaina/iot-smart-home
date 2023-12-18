@@ -40,7 +40,7 @@ def save_to_db(data):
         .tag("simulated", data["simulated"])
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
-        .field("value", data["value"])
+        .field(data["field_name"], data["value"])
     )
     write_api.write(bucket=bucket, org=org, record=point)
 

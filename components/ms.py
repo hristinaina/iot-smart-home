@@ -46,6 +46,7 @@ def ms_callback(code, publish_event, dht_settings, verbose=False):
         "simulated": dht_settings['simulated'],
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
+        "field_name": dht_settings["field_name"],
         "value": code
     }
 
