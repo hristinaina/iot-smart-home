@@ -9,7 +9,7 @@ from settings import lock, HOSTNAME, PORT
 
 button_batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 2
 counter_lock = threading.Lock()
 
 

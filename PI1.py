@@ -59,10 +59,10 @@ if __name__ == "__main__":
 
         while True:
             user_input = input().strip().upper()
-            if user_input == "DBA":
+            if user_input == "B":
                 buzzer_stop_event.clear()
                 run_buzzer(db_settings, threads, buzzer_stop_event)
-            elif user_input == "DBD":
+            elif user_input == "D":
                 buzzer_stop_event.set()
             elif user_input == "X":
                 stop_event.set()
