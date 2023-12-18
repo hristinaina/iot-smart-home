@@ -9,7 +9,7 @@ def button_pressed(name):
         t = time.localtime()
         print("=" * 10 + name + "=" * 10)
         print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print("The door OPENED")
+        print("The door are OPENED")
 
 
 def button_released(name):
@@ -17,7 +17,7 @@ def button_released(name):
         t = time.localtime()
         print("=" * 10 + name + "=" * 10)
         print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print("The door CLOSED")
+        print("The door are CLOSED")
 
 
 def run_button(settings, threads, stop_event):
