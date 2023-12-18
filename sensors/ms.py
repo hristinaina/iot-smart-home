@@ -54,10 +54,10 @@ class MS:
         return self.pass_code
 
 
-def run_ms_loop(ms, delay, callback, stop_event):
+def run_ms_loop(ms, delay, callback, stop_event, publish_event, settings):
     while True:
         passcode = ms.get_pass()
-        callback(passcode, ms.name)
+        callback(passcode, publish_event, settings)
         if stop_event.is_set():
             break
         time.sleep(delay)  # Delay between readings
