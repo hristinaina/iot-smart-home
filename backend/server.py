@@ -21,8 +21,8 @@ mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 60)
 mqtt_client.loop_start()
 
-# Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password
-# Topic names: data/dht, data/pir, data/button, data/buzzer, data/light, data/ms
+# Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS
+# Topic names: data/temperature, data/humidity, data/pir, data/button, data/buzzer, data/light, data/ms, data/uds
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("data/+")
