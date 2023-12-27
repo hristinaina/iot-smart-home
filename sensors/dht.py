@@ -15,7 +15,7 @@ class DHT:
     temperature = 0
 
     def __init__(self, name, pin):
-        self.pin = pin
+        self.pin = int(pin)
         self.name = name
         self.bits = [0, 0, 0, 0, 0]
 

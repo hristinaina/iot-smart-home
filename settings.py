@@ -1,7 +1,7 @@
 import json
 import threading
 
-HOSTNAME = "localhost"
+HOSTNAME = "10.1.121.27"
 PORT = 1883
 
 

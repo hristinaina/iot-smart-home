@@ -8,10 +8,9 @@ import time
 
 from simulators.light import run_light_simulator
 
-
 light_batch = []
 publish_data_counter = 0
-publish_data_limit = 2
+publish_data_limit = 3
 counter_lock = threading.Lock()
 
 
@@ -71,8 +70,9 @@ def run_light(pipe, settings, threads, stop_event):
     else:
         from sensors.light import run_light_loop, light
         print("Starting {} loop".format(settings["name"]))
-        l = light(settings["pin"], settings["name"])
-        uds_thread = threading.Thread(target=run_light_loop, args=(pipe, l, 2, light_callback, stop_event, publish_event, settings))
+        l = light(settings["name"], settings["pin"])
+        uds_thread = threading.Thread(target=run_light_loop,
+                                      args=(pipe, l, 2, light_callback, stop_event, publish_event, settings))
         uds_thread.start()
         threads.append(uds_thread)
         print("{} loop started".format(settings["name"]))

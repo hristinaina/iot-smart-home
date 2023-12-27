@@ -4,9 +4,10 @@ import time
 
 class light:
     def __init__(self, name, pin):
-        self.pin = pin
+        self.pin = int(pin)
         self.name = name
         self.is_on = False
+        GPIO.setup(self.pin, GPIO.OUT)
 
     def switch_light(self):
         self.is_on = not self.is_on

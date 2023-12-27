@@ -6,14 +6,14 @@ import RPi.GPIO as GPIO
 class MS:
 
     def __init__(self, settings):
-        self.R1 = settings["R1"]
-        self.R2 = settings["R2"]
-        self.R3 = settings["R3"]
-        self.R4 = settings["R4"]
-        self.C1 = settings["C1"]
-        self.C2 = settings["C2"]
-        self.C3 = settings["C3"]
-        self.C4 = settings["C4"]
+        self.R1 = int(settings["R1"])
+        self.R2 = int(settings["R2"])
+        self.R3 = int(settings["R3"])
+        self.R4 = int(settings["R4"])
+        self.C1 = int(settings["C1"])
+        self.C2 = int(settings["C2"])
+        self.C3 = int(settings["C3"])
+        self.C4 = int(settings["C4"])
         self.name = settings["name"]
         self.pass_code = ""
         GPIO.setwarnings(False)

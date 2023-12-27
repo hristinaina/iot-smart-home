@@ -3,14 +3,13 @@ import time
 
 
 class UDS:
-    def __int__(self, trig_pin, echo_pin,max_iter,name):
+    def __init__(self, trig_pin, echo_pin, max_iter, name):
         self.trig_pin = trig_pin
         self.echo_pin = echo_pin
         GPIO.setup(self.trig_pin, GPIO.OUT)
         GPIO.setup(self.echo_pin, GPIO.IN)
-        self.max_ter = max_iter
+        self.max_iter = max_iter
         self.name = name
-
 
     def get_distance(self):
         GPIO.output(self.trig_pin, False)
@@ -20,8 +19,6 @@ class UDS:
         GPIO.output(self.trig_pin, False)
         pulse_start_time = time.time()
         pulse_end_time = time.time()
-
-
 
         iter = 0
         while GPIO.input(self.echo_pin) == 0:
