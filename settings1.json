@@ -1,44 +1,58 @@
 {
   "DHT1": {
     "name": "RDH1",
-    "simulated": true,
-    "pin": 26
+    "simulated": false,
+    "pin": 26,
+    "runs_on": "PI1",
+    "field_name": "value"
   },
   "DHT2": {
     "name": "RDH2",
     "simulated": true,
-    "pin": 6
+    "pin": 6,
+    "runs_on": "PI1",
+    "field_name": "value"
   },
   "DUS1": {
     "name": "DUS1",
-    "simulated": true,
+    "simulated": false,
     "echo_pin": 23,
     "trig_pin": 24,
-    "max_iter": 100
+    "max_iter": 100,
+    "runs_on": "PI1",
+    "field_name": "value"
   },
   "RPIR1": {
     "name": "RPIR1",
-    "simulated": true,
-    "pin": 4
+    "simulated": false,
+    "pin": 10,
+    "runs_on": "PI1",
+    "field_name": "status"
   },
   "RPIR2": {
     "name": "RPIR2",
     "simulated": true,
-    "pin": 3
+    "pin": 3,
+    "runs_on": "PI1",
+    "field_name": "status"
   },
   "DPIR1": {
     "name": "DPIR1",
     "simulated": true,
-    "pin": 17
+    "pin": 17,
+    "runs_on": "PI1",
+    "field_name": "status"
   },
   "DS1": {
     "name": "DS1",
-    "simulated": true,
-    "pin": 27
+    "simulated": false,
+    "pin": 27,
+    "runs_on": "PI1",
+    "field_name": "status"
   },
   "DMS": {
     "name": "DMS",
-    "simulated": true,
+    "simulated": false,
     "R1": 25,
     "R2": 8,
     "R3": 7,
@@ -46,16 +60,22 @@
     "C1": 12,
     "C2": 16,
     "C3": 20,
-    "C4": 21
+    "C4": 21,
+    "runs_on": "PI1",
+    "field_name": "status"
   },
   "DB": {
     "name": "DB",
-    "simulated": true,
-    "pin": 5
+    "simulated": false,
+    "pin": 5,
+    "runs_on": "PI1",
+    "field_name": "status"
   },
   "DL": {
     "name": "DL",
-    "simulated": true,
-    "pin": 22
+    "simulated": false,
+    "pin": 22,
+    "runs_on": "PI1",
+    "field_name": "status"
   }
 }

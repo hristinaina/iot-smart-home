@@ -4,9 +4,10 @@ import time
 
 class light:
     def __init__(self, name, pin):
-        self.pin = pin
+        self.pin = int(pin)
         self.name = name
         self.is_on = False
+        GPIO.setup(self.pin, GPIO.OUT)
 
     def switch_light(self):
         self.is_on = not self.is_on
@@ -16,14 +17,13 @@ class light:
             GPIO.output(self.pin, GPIO.LOW)
 
 
-def run_light_loop(pipe,light, delay, callback, stop_event):
+def run_light_loop(pipe, light, delay, callback, stop_event, publish_event, settings):
     while True:
         message = pipe.recv()
         message = str(message).strip().lower()
         if message == "l":
-            light_state = not light_state
             light.switch_light()
-        callback(light.is_on, light.name)
+        callback(light.is_on, publish_event, settings)
         if stop_event.is_set():
             break
         time.sleep(delay)

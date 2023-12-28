@@ -16,11 +16,11 @@ def play_sound(delay):
     playsound(frequency, delay * 100)
 
 
-def run_buzzer_simulator(delay, callback_activated, callback_deactivated, name, stop_event):
-    callback_activated(name)
+def run_buzzer_simulator(delay, callback_activated, callback_deactivated, stop_event, publish_event, settings):
+    callback_activated(publish_event, settings)
     while True:
         play_sound(delay)
         if stop_event.is_set():
-            callback_deactivated(name)
+            callback_deactivated(publish_event, settings)
             break
         time.sleep(delay)
