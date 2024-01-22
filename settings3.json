@@ -19,5 +19,12 @@
     "pin": 6,
     "runs_on": "PI3",
     "field_name": "value"
+  },
+  "BIR": {
+    "name": "BIR",
+    "simulated": true,
+    "pin": 7,
+    "runs_on": "PI3",
+    "field_name": "status"
   }
 }

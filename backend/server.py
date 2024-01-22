@@ -22,9 +22,9 @@ mqtt_client.connect("localhost", 1883, 60)
 mqtt_client.loop_start()
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
-#              Acceleration, Gyroscope
+#              Acceleration, Gyroscope, Infrared
 # Topic names: data/temperature, data/humidity, data/pir, data/button, data/buzzer, data/light, data/ms, data/uds,
-#              data/acceleration, data/gyroscope
+#              data/acceleration, data/gyroscope, data/ir
 
 
 def on_connect(client, userdata, flags, rc):

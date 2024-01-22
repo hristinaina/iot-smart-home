@@ -2,6 +2,7 @@ import multiprocessing
 import threading
 
 from components.button import run_button
+from components.infrared import run_infrared
 from components.lcd import run_lcd
 from components.ms import run_ms
 from components.button import run_button
@@ -40,9 +41,11 @@ if __name__ == "__main__":
         rdht4_settings = settings['RDHT4']
         rpir4_settings = settings['RPIR4']
         bb_settings = settings['BB']
+        bir_settings = settings['BIR']
 
         run_dht(rdht4_settings, threads, stop_event)
         run_pir(rpir4_settings, threads, stop_event)
+        run_infrared(bir_settings, threads, stop_event)
 
         while True:
             user_input = input().strip().upper()
