@@ -21,14 +21,14 @@ except:
 
 def menu():
     print("="*10 + "  MENU  " + "="*10)
-    print("-- Enter DBA to activate buzzer --")
-    print("-- Enter DBD to deactivate buzzer --")
+    print("-- Enter B to activate buzzer --")
+    print("-- Enter D to deactivate buzzer --")
     print("-- Enter X to stop all devices --")
     print("=" * 30)
 
 
 if __name__ == "__main__":
-    print('Starting app')
+    print('Starting PI1')
     menu()
     settings = load_settings()
     threads = []

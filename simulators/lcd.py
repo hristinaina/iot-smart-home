@@ -1,7 +1,7 @@
 import json
 import random
 import time
-from paho import mqtt
+import paho.mqtt.client as mqtt
 
 
 humidity = 0
@@ -33,6 +33,7 @@ def connect_mqtt():
 
 
 def run_lcd_simulator(delay, callback, stop_event, settings):
+    connect_mqtt()
     while True:
         callback(humidity, temperature, settings)
         if stop_event.is_set():
