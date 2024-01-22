@@ -18,7 +18,7 @@ influxdb_client = InfluxDBClient(url=url, token=token, org=org)
 
 # MQTT Configuration
 mqtt_client = mqtt.Client()
-mqtt_client.connect("localhost", 1883, 60)
+mqtt_client.connect("localhost", 1883, 0)
 mqtt_client.loop_start()
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
@@ -33,6 +33,21 @@ def on_connect(client, userdata, flags, rc):
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, json.loads(msg.payload.decode('utf-8')))
+
+def command_callback(data):
+    # if data["measurement"] == "Buzzer_active":
+    #     if data["value"] == "on":
+    #         mqtt_client.publish("pi1", json.dumps({"trigger": "B"}))
+    #     elif data["value"] == "off":
+    #         mqtt_client.publish("pi1", json.dumps({"trigger": "D"}))
+    # elif data["measurement"] == "Light_status":
+    #     if data["value"] == "on":
+    #         mqtt_client.publish("pi1", json.dumps({"trigger": "L"}))
+    #     elif data["value"] == "off":
+    #         mqtt_client.publish("pi1", json.dumps({"trigger": "X"}))
+
+    if data["name"] =="DPIR1" and data['value'] == "detected":
+        mqtt_client.publish("pi1", json.dumps({"trigger": "L"}))
 
 
 def save_to_db(topic, data):
@@ -56,6 +71,7 @@ def save_to_db(topic, data):
             .field(data["field_name"], data["value"])
         )
     write_api.write(bucket=bucket, org=org, record=point)
+    command_callback(data)
 
 
 def handle_influx_query(query):
