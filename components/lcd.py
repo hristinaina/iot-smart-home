@@ -2,10 +2,12 @@ import threading
 import time
 from simulators.lcd import run_lcd_simulator
 
+
 def lcd_callback(humidity, temperature, lcd_settings):
         t = time.localtime()
         print("=" * 10 + lcd_settings["name"] + "=" * 10)
         print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+        print("Showing data below")
         print(f"Humidity: {humidity}%")
         print(f"Temperature: {temperature}°C")
 

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import json
+
+from paho import mqtt
 
 from PCF8574 import PCF8574_GPIO
 from Adafruit_LCD1602 import Adafruit_CharLCD
@@ -6,15 +9,33 @@ from Adafruit_LCD1602 import Adafruit_CharLCD
 from time import sleep, strftime
 from datetime import datetime
 
-# todo change this with mqtt to get dht value
-def get_cpu_temp():     # get CPU temperature and store it into file "/sys/class/thermal/thermal_zone0/temp"
-    tmp = open('/sys/class/thermal/thermal_zone0/temp')
-    cpu = tmp.read()
-    tmp.close()
-    return '{:.2f}'.format( float(cpu)/1000 ) + ' C'
- 
-def get_time_now():     # get system time
-    return datetime.now().strftime('    %H:%M:%S')
+
+humidity = 0
+temperature = 0
+DHT_NAME = "GDHT"
+
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe("data/temperature")
+    client.subscribe("data/humidity")
+
+
+def update_data(topic, data):
+    global humidity, temperature
+    if data["name"] == DHT_NAME:
+        if topic == "data/temperature":
+            temperature = data["value"]
+        elif topic == "data/humidity":
+            humidity = data["value"]
+
+
+def connect_mqtt():
+    # MQTT Configuration
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = lambda client, userdata, msg: update_data(msg.topic, json.loads(msg.payload.decode('utf-8')))
 
 
 def create_lcd_and_adapter(settings):
@@ -37,12 +58,13 @@ def create_lcd_and_adapter(settings):
 def run_lcd_loop(lcd, mcp, delay, callback, stop_event, settings):
     mcp.output(3, 1)     # turn on LCD backlight
     lcd.begin(16, 2)     # set number of LCD lines and columns
+    connect_mqtt()
     while True:
-        #lcd.clear()
+        lcd.clear()
         lcd.setCursor(0, 0)  # set cursor position
-        #todo display message from mqtt and call callback with setting
-        lcd.message('CPU: ' + get_cpu_temp()+'\n' )# display CPU temperature
-        lcd.message(get_time_now())   # display the time
+        lcd.message("Humidity: ", humidity)
+        lcd.message("Temperature: ", temperature)
+        callback(humidity, temperature, settings)
         if stop_event.is_set():
             break
         sleep(delay)

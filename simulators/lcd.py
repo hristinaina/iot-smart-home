@@ -1,21 +1,40 @@
+import json
 import random
 import time
+from paho import mqtt
 
 
-def generate_values(initial_distance=10):
-    distance = initial_distance
-    sing = 1
-    while True:
-        distance = distance + random.randint(1, 5)*sing
-        if distance>100 or distance< 5:
-            sing*=-1
-        yield distance
+humidity = 0
+temperature = 0
+DHT_NAME = "GDHT"
+
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe("data/temperature")
+    client.subscribe("data/humidity")
+
+
+def update_data(topic, data):
+    global humidity, temperature
+    if data["name"] == DHT_NAME:
+        if topic == "data/temperature":
+            temperature = data["value"]
+        elif topic == "data/humidity":
+            humidity = data["value"]
+
+
+def connect_mqtt():
+    # MQTT Configuration
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = lambda client, userdata, msg: update_data(msg.topic, json.loads(msg.payload.decode('utf-8')))
 
 
 def run_lcd_simulator(delay, callback, stop_event, settings):
-    # todo get value from dht mqtt simulator
-    for distance in generate_values():
-        time.sleep(delay)  # Delay between readings (adjust as needed)
-        callback(distance, settings)
+    while True:
+        callback(humidity, temperature, settings)
         if stop_event.is_set():
             break
+        time.sleep(delay)
