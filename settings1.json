@@ -1,7 +1,7 @@
 {
   "DHT1": {
     "name": "RDH1",
-    "simulated": false,
+    "simulated": true,
     "pin": 26,
     "runs_on": "PI1",
     "field_name": "value"
@@ -15,7 +15,7 @@
   },
   "DUS1": {
     "name": "DUS1",
-    "simulated": false,
+    "simulated": true,
     "echo_pin": 23,
     "trig_pin": 24,
     "max_iter": 100,
@@ -24,7 +24,7 @@
   },
   "RPIR1": {
     "name": "RPIR1",
-    "simulated": false,
+    "simulated": true,
     "pin": 10,
     "runs_on": "PI1",
     "field_name": "status"
@@ -45,14 +45,14 @@
   },
   "DS1": {
     "name": "DS1",
-    "simulated": false,
+    "simulated": true,
     "pin": 27,
     "runs_on": "PI1",
     "field_name": "status"
   },
   "DMS": {
     "name": "DMS",
-    "simulated": false,
+    "simulated": true,
     "R1": 25,
     "R2": 8,
     "R3": 7,
@@ -66,14 +66,14 @@
   },
   "DB": {
     "name": "DB",
-    "simulated": false,
+    "simulated": true,
     "pin": 5,
     "runs_on": "PI1",
     "field_name": "status"
   },
   "DL": {
     "name": "DL",
-    "simulated": false,
+    "simulated": true,
     "pin": 22,
     "runs_on": "PI1",
     "field_name": "status"

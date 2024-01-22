@@ -1,0 +1,61 @@
+{
+  "GDHT": {
+    "name": "GDHT",
+    "simulated": true,
+    "pin": 26,
+    "runs_on": "PI2",
+    "field_name": "value"
+  },
+  "GLCD": {
+    "name": "GLCD",
+    "simulated": true,
+    "pin_rs": 25,
+    "pin_e": 24,
+    "pins_db":  [23, 17, 21, 22],
+    "runs_on": "PI2",
+    "field_name": "value"
+  },
+  "RDHT3": {
+    "name": "RDHT3",
+    "simulated": true,
+    "pin": 6,
+    "runs_on": "PI2",
+    "field_name": "value"
+  },
+  "DUS2": {
+    "name": "DUS2",
+    "simulated": true,
+    "echo_pin": 5,
+    "trig_pin": 16,
+    "max_iter": 100,
+    "runs_on": "PI2",
+    "field_name": "value"
+  },
+  "RPIR3": {
+    "name": "RPIR3",
+    "simulated": true,
+    "pin": 10,
+    "runs_on": "PI2",
+    "field_name": "status"
+  },
+  "DPIR2": {
+    "name": "DPIR2",
+    "simulated": true,
+    "pin": 3,
+    "runs_on": "PI2",
+    "field_name": "status"
+  },
+  "DS2": {
+    "name": "DS2",
+    "simulated": true,
+    "pin": 27,
+    "runs_on": "PI2",
+    "field_name": "status"
+  },
+  "GSG": {
+    "name": "GSG",
+    "simulated": true,
+    "runs_on": "PI2",
+    "field_name": "value"
+  }
+}

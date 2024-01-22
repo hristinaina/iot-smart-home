@@ -1,0 +1,23 @@
+{
+  "BB": {
+    "name": "BB",
+    "simulated": true,
+    "pin": 5,
+    "runs_on": "PI3",
+    "field_name": "status"
+  },
+  "RPIR4": {
+    "name": "RPIR4",
+    "simulated": true,
+    "pin": 17,
+    "runs_on": "PI3",
+    "field_name": "status"
+  },
+  "RDHT4": {
+    "name": "RDHT4",
+    "simulated": true,
+    "pin": 6,
+    "runs_on": "PI3",
+    "field_name": "value"
+  }
+}
