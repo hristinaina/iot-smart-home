@@ -1,6 +1,7 @@
 import multiprocessing
 import threading
 
+from components.gyro import run_gyro
 from components.lcd import run_lcd
 from components.button import run_button
 from components.uds import run_uds
@@ -35,7 +36,7 @@ if __name__ == "__main__":
         rpir3_settings = settings['RPIR3']
         dpir2_settings = settings['DPIR2']
         glcd_settings = settings['GLCD']
-        #gsg_settings = settings['GSG']
+        gsg_settings = settings['GSG']
         ds2_settings = settings['DS2']
 
         run_dht(gdht_settings, threads, stop_event)
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         run_pir(rpir3_settings, threads, stop_event)
         run_pir(dpir2_settings, threads, stop_event)
         run_lcd(glcd_settings, threads, stop_event)
-        #run_gyr((gsg_settings, threads, stop_event)
+        run_gyro(gsg_settings, threads, stop_event)
         run_button(ds2_settings, threads, stop_event)
 
         while True:

@@ -51,5 +51,11 @@
     "pin": 27,
     "runs_on": "PI2",
     "field_name": "status"
+  },
+  "GSG": {
+    "name": "GSG",
+    "simulated": true,
+    "runs_on": "PI2",
+    "field_name": "value"
   }
 }
