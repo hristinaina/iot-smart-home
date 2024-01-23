@@ -18,6 +18,7 @@ mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 0)
 mqtt_client.loop_start()
 in_house = 0
+is_alarm = False
 
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
@@ -62,6 +63,33 @@ def adjust_people_count(device_number=1):
         write_api.write(bucket=bucket, org=org, record=point)
 
 
+def check_movement(data):
+    with app.app_context():
+        axis =str( data["axis"])
+        global is_alarm
+        query = ('from(bucket: "test_bucket") |> range(start: -10s, stop: now())'
+                 '|> filter(fn: (r) => r["_measurement"] == "Gyroscope")'
+                 '|> filter(fn: (r) => r["name"] == "GSG")'
+                 '|> filter(fn: (r) => r["axis"] == "'+axis+'")'
+                 '|> aggregateWindow(every: 5s, fn: last, createEmpty: false)'
+                 '|> yield(name: "last")')
+        response = handle_influx_query(query)
+        values = json.loads(response.data.decode('utf-8'))['data']
+        if len(values)>0:
+            diff =abs( values[0]["_value"] - data["value"])
+            if diff >10:
+                is_alarm = True
+
+        point = (
+            Point("Alarm")
+            .tag("name", "overall")
+            .field("Is_alarm", "on" if is_alarm else "off")
+        )
+        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+        write_api.write(bucket=bucket, org=org, record=point)
+
+
+
 def command_callback(data):
     # if data["measurement"] == "Buzzer_active":
     #     if data["value"] == "on":
@@ -79,6 +107,8 @@ def command_callback(data):
         adjust_people_count()
     if data["name"] == "DPIR2" and data['value'] == "detected":
         adjust_people_count(2)
+    if data["name"] == "GSG":
+        check_movement(data)
 
 
 def save_to_db(topic, data):
