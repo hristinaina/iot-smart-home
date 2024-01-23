@@ -9,7 +9,7 @@
   "RPIR4": {
     "name": "RPIR4",
     "simulated": true,
-    "pin": 17,
+    "pin": 19,
     "runs_on": "PI3",
     "field_name": "status"
   },
@@ -23,7 +23,7 @@
   "BIR": {
     "name": "BIR",
     "simulated": true,
-    "pin": 7,
+    "pin": 13,
     "runs_on": "PI3",
     "field_name": "status"
   },
@@ -31,8 +31,16 @@
     "name": "BRGB",
     "simulated": true,
     "red_pin": 16,
-    "blue_pin": 22,
+    "blue_pin": 12,
     "green_pin": 26,
+    "runs_on": "PI3",
+    "field_name": "status"
+  },
+    "B4SD": {
+    "name": "B4SD",
+    "simulated": true,
+    "segments": [11,4,23,8,7,10,18,25],
+    "digits": [22,27,17,24],
     "runs_on": "PI3",
     "field_name": "status"
   }
