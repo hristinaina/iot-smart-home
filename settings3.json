@@ -26,5 +26,14 @@
     "pin": 7,
     "runs_on": "PI3",
     "field_name": "status"
+  },
+    "BRGB": {
+    "name": "BRGB",
+    "simulated": true,
+    "red_pin": 16,
+    "blue_pin": 22,
+    "green_pin": 26,
+    "runs_on": "PI3",
+    "field_name": "status"
   }
 }

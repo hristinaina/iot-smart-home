@@ -4,6 +4,7 @@ import random
 buttons_names = ["LEFT", "RIGHT", "UP", "DOWN", "2", "3", "1", "OK", "4", "5", "6", "7", "8", "9", "*", "0", "#"]
 # String list in same order as HEX list
 
+
 def get_key():
         index = random.randint(0, len(buttons_names) - 1)
         return buttons_names[index]
