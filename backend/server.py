@@ -1,16 +1,17 @@
+import time
+
+from flask_socketio import SocketIO
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
 import json
-
 import settings
-
 
 app = Flask(__name__)
 CORS(app)
-
+socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000", async_mode='threading')
 
 # InfluxDB Configuration
 token = "test_token"
@@ -33,6 +34,21 @@ mqtt_client.loop_start()
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("data/+")
+
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected successfully\n')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected successfully\n')
+
+def send_data_to_client(data):
+    try:
+        socketio.emit('data/'+data["runs_on"], {'message': data})
+        print("Data sent to topic: data/" + data["runs_on"])
+    except Exception as e:
+        print(e)
 
 
 mqtt_client.on_connect = on_connect
@@ -60,6 +76,8 @@ def save_to_db(topic, data):
             .field(data["field_name"], data["value"])
         )
     write_api.write(bucket=bucket, org=org, record=point)
+    send_data_to_client(data)
+
 
 @app.route('/api/devices/<pi_id>', methods=['GET'])
 @cross_origin()

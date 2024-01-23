@@ -3,7 +3,7 @@ import { Component } from 'react';
 import './Devices.css';
 import { Navigation } from './Navigation';
 import DeviceService from '../services/DeviceService'
-import mqtt from 'mqtt';
+import io from 'socket.io-client';
 
 export class Devices extends Component {
     connected = false;
@@ -13,9 +13,9 @@ export class Devices extends Component {
         this.state = {
             data: [],
         };
-        this.mqttClient = null;
         this.connecting = false; //change to true if you want to use this
         this.pi =this.extractPIFromUrl();
+        this.socket = null;
     }
 
     async fetchData(){
@@ -31,65 +31,49 @@ export class Devices extends Component {
     async componentDidMount() {
         this.fetchData();
 
-        try {
-            if (!this.connected) {  // to avoid reconnecting because this renders 2 times !!!
-                this.connected = true;
-                this.mqttClient = mqtt.connect('ws://localhost:9001/mqtt', {
-                    clientId: "react-front-iot-devices",
-                    clean: false,
-                    keepalive: 60
-                });
-                console.log("Connected to mqtt broker");
-                // Subscribe to the MQTT topic for device status
-                this.mqttClient.on('connect', () => {
-                    this.mqttClient.subscribe('data/+');
-                });
+        this.socket = io('http://localhost:8000');
 
-                // Handle incoming MQTT messages
-                this.mqttClient.on('message', (topic, message) => {
-                    this.handleMqttMessage(topic, message);
-                });
-            }
-        } catch (error) {
-            console.log("Error trying to connect to broker");
-            console.log(error);
-        }
+        this.socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        this.socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });        
+
+        // Listen for messages from the server
+        this.socket.on('data/'+this.pi, (msg) => {
+            const message = msg.message
+            console.log(message);
+            // Handle the received data as needed
+            this.setState((prevState) => {
+                const { data } = prevState;
+                const deviceName = message.name;
+                const value = message.value;
+
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            value: value,
+                        }
+                        : device
+                );
+
+                return {
+                    data: updatedData,
+                };
+            });
+        });
     }
 
     componentWillUnmount() {
-        // Disconnect MQTT client on component unmount
-        if (this.mqttClient) {
-            this.mqttClient.end();
-        }
+        this.socket.disconnect();
     }
 
     extractPIFromUrl() {
         const parts = window.location.href.split('/');
         return parts[parts.length - 1];
-    }
-
-    // Handle incoming MQTT messages
-    handleMqttMessage(topic, message) {
-        console.log("handle message");
-        this.setState((prevState) => {
-            const { data } = prevState;
-            const deviceId = parseInt(this.extractDeviceNameFromTopic(topic));
-            const status = message.toString();
-
-            // // Update the IsOnline status based on the received MQTT message
-            // const updatedData = data.map((device) =>
-            //     device.Id == deviceId
-            //         ? {
-            //             ...device,
-            //             Status: status === 'online',
-            //         }
-            //         : device
-            // );
-
-            // return {
-            //     data: updatedData,
-            // };
-        });
     }
 
     //todo navigate to appropriate page
@@ -112,11 +96,6 @@ export class Devices extends Component {
             window.location.assign("/hb/" + device.Id)
         else if (device.Type === 'Electric vehicle charger')
             window.location.assign("/lamp/" + device.Id)
-    }
-
-    extractDeviceNameFromTopic(topic) {
-        const parts = topic.split('/');
-        return parts[parts.length - 1];
     }
 
     render() {
@@ -155,6 +134,7 @@ const DevicesList = ({ devices, onClick, connecting }) => {
                                 <p className='device-text'>{device.type}</p>
                                 {device.simulated && (<p className='device-text'><b>Simulation:</b> True</p>)}
                                 {!device.simulated && (<p className='device-text'><b>Simulation:</b> False</p>)}
+                                <p className='device-text'><b>Value: </b>{device.value}</p>
                             </div>
                         </div>
                     ))}
