@@ -45,10 +45,10 @@ class B4SD:
         return "{}:{}".format(n[0:2], n[2:])
 
 
-def run_b4sd_loop(b4sd, delay, callback, stop_event, settings):
+def run_b4sd_loop(b4sd, delay, callback, stop_event, publish_event, settings):
     while True:
         value = b4sd.show_value()
-        callback(value, settings)
+        callback(value, publish_event, settings)
         if stop_event.is_set():
             GPIO.cleanup()
             break

@@ -7,10 +7,10 @@ def generate_value():
     return "{}:{}".format(n[0:2], n[2:])
 
 
-def run_b4sd_simulator(delay, callback, stop_event, settings):
+def run_b4sd_simulator(delay, callback, stop_event, publish_event, settings):
     while True:
         time_value = generate_value()
-        callback(time_value, settings)
+        callback(time_value, publish_event, settings)
         if stop_event.is_set():
             break
         time.sleep(delay)

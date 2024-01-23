@@ -10,7 +10,7 @@ from simulators.rgb import run_rgb_simulator
 
 rgb_batch = []
 publish_data_counter = 0
-publish_data_limit = 3
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 

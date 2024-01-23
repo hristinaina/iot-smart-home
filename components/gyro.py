@@ -54,7 +54,7 @@ def gyro_callback(accel, gyro, publish_event, gyro_settings, verbose=False):
             "name": gyro_settings["name"],
             "field_name": gyro_settings["field_name"],
             "axis": axis[i],
-            "value": accel[i]
+            "value": round(accel[i], 2)
         }
         gyro_payload = {
             "measurement": "Gyroscope",
@@ -63,7 +63,7 @@ def gyro_callback(accel, gyro, publish_event, gyro_settings, verbose=False):
             "name": gyro_settings["name"],
             "field_name": gyro_settings["field_name"],
             "axis": axis[i],
-            "value": gyro[i]
+            "value": round(gyro[i], 2)
         }
         accel_payloads.append(accel_payload)
         gyro_payloads.append(gyro_payload)

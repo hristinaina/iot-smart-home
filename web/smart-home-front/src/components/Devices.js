@@ -45,26 +45,161 @@ export class Devices extends Component {
         this.socket.on('data/'+this.pi, (msg) => {
             const message = msg.message
             console.log(message);
-            // Handle the received data as needed
+            let updated = this.updateDHT(message);
+            if (updated) return;
+            updated = this.updateGyro(message);
+            if (updated) return;
+            // other
             this.setState((prevState) => {
                 const { data } = prevState;
                 const deviceName = message.name;
                 const value = message.value;
-
+                
                 const updatedData = data.map((device) =>
                     device.name == deviceName
                         ? {
                             ...device,
                             value: value,
+                            measurement: message.measurement
                         }
                         : device
                 );
-
                 return {
                     data: updatedData,
                 };
             });
         });
+    }
+
+    updateDHT(message){
+        let updated = false;
+        this.setState((prevState) => {
+            const { data } = prevState;
+            const deviceName = message.name;
+            const value = message.value;
+
+            if(message.measurement == "Temperature"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName || (device.name == "GLCD" && deviceName == "GDHT")
+                        ? {
+                            ...device,
+                            valueT: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            }
+            else if(message.measurement == "Humidity"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName || (device.name == "GLCD" && deviceName == "GDHT")
+                        ? {
+                            ...device,
+                            valueH: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            }
+        })
+        return updated;
+    }
+
+    updateGyro(message){
+        let updated = false;
+        this.setState((prevState) => {
+            const { data } = prevState;
+            const deviceName = message.name;
+            const value = message.value;
+            if(message.measurement == "Acceleration" && message.axis == "x"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            valueAX: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            }
+            else if(message.measurement == "Acceleration" && message.axis == "y"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            valueAY: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            }
+            else if(message.measurement == "Acceleration" && message.axis == "z"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            valueAZ: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            }
+            else if(message.measurement == "Gyroscope"  && message.axis == "x"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            valueGX: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            } else if(message.measurement == "Gyroscope"  && message.axis == "y"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            valueGY: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            } else if(message.measurement == "Gyroscope"  && message.axis == "z"){
+                updated = true;
+                const updatedData = data.map((device) =>
+                    device.name == deviceName
+                        ? {
+                            ...device,
+                            valueGZ: value,
+                        }
+                        : device
+                );
+                return {
+                    data: updatedData,
+                };
+            }
+        })
+        return updated;
     }
 
     componentWillUnmount() {
@@ -134,7 +269,13 @@ const DevicesList = ({ devices, onClick, connecting }) => {
                                 <p className='device-text'>{device.type}</p>
                                 {device.simulated && (<p className='device-text'><b>Simulation:</b> True</p>)}
                                 {!device.simulated && (<p className='device-text'><b>Simulation:</b> False</p>)}
-                                <p className='device-text'><b>Value: </b>{device.value}</p>
+                                {device.type.slice(-3) == "DHT" && (<p className='device-text'><b>Temperature: </b>{device.valueT}°C</p>)}
+                                {device.type.slice(-3) == "DHT" && (<p className='device-text'><b>Humidity: </b>{device.valueH}%</p>)}
+                                {device.name == "GLCD" && (<p className='device-text'><b>Temperature: </b>{device.valueT}°C</p>)}
+                                {device.name == "GLCD" && (<p className='device-text'><b>Humidity: </b>{device.valueH}%</p>)}
+                                {device.name == "GSG" && (<p className='device-text'><b>Acceleration: </b>{device.valueAX}, {device.valueAY}, {device.valueAZ}</p>)}
+                                {device.name == "GSG" && (<p className='device-text'><b>Gyroscope: </b>{device.valueGX}, {device.valueGY}, {device.valueGZ}</p>)}
+                                {device.type.slice(-3) != "DHT" && device.name != "GSG" && device.name != "GLCD" && (<p className='device-text'><b>{device.measurement}: </b>{device.value}</p>)}
                             </div>
                         </div>
                     ))}

@@ -9,7 +9,7 @@ from simulators.infrared import run_ir_simulator
 
 ir_batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 1
 counter_lock = threading.Lock()
 
 
@@ -62,7 +62,7 @@ def run_infrared(settings, threads, stop_event):
     if settings['simulated']:
         print("Starting {} simulator".format(settings["name"]))
         ir_thread = threading.Thread(target=run_ir_simulator,
-                                      args=(2, ir_callback, stop_event, publish_event, settings))
+                                      args=(5, ir_callback, stop_event, publish_event, settings))
         ir_thread.start()
         threads.append(ir_thread)
         print("{0} simulator started".format(settings["name"]))
@@ -71,7 +71,7 @@ def run_infrared(settings, threads, stop_event):
         print("Starting {} loop".format(settings["name"]))
         ir = Infrared(settings["pin"], settings["name"])
         ir_thread = threading.Thread(target=run_ir_loop,
-                                      args=(ir, 2, ir_callback, stop_event, publish_event, settings))
+                                      args=(ir, 5, ir_callback, stop_event, publish_event, settings))
         ir_thread.start()
         threads.append(ir_thread)
         print("{} loop started".format(settings["name"]))
