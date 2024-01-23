@@ -1,10 +1,23 @@
-import React from 'react';
+import React , { useEffect, useRef  } from 'react';
 import { Navbar, NavItem, NavLink } from 'reactstrap';
 import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
 
 export function Navigation() {
   const location = useLocation();
+
+  const prevPathnameRef = useRef(location.pathname);
+
+  useEffect(() => {
+    // Check if the route has changed before triggering a reload
+    if (prevPathnameRef.current !== location.pathname) {
+      console.log('Route changed:', location.pathname);
+      window.location.reload();
+    }
+
+    // Update the previous pathname for the next render
+    prevPathnameRef.current = location.pathname;
+  }, [location.pathname]);
 
   return (
     <header>

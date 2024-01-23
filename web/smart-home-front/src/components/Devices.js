@@ -7,7 +7,6 @@ import mqtt from 'mqtt';
 
 export class Devices extends Component {
     connected = false;
-    navigationToNewDevice = false;
 
     constructor(props) {
         super(props);
@@ -16,17 +15,21 @@ export class Devices extends Component {
         };
         this.mqttClient = null;
         this.connecting = false; //change to true if you want to use this
+        this.pi =this.extractPIFromUrl();
     }
 
-    async componentDidMount() {
+    async fetchData(){
         try {
-            const result = await DeviceService.getDevices(this.id);
+            const result = await DeviceService.getDevices(this.pi);
             this.setState({ data: result });
         } catch (error) {
             console.log("Error fetching data from the server");
             console.log(error);
-            window.location.assign("/");
         }
+    }
+
+    async componentDidMount() {
+        this.fetchData();
 
         try {
             if (!this.connected) {  // to avoid reconnecting because this renders 2 times !!!
@@ -58,6 +61,11 @@ export class Devices extends Component {
         if (this.mqttClient) {
             this.mqttClient.end();
         }
+    }
+
+    extractPIFromUrl() {
+        const parts = window.location.href.split('/');
+        return parts[parts.length - 1];
     }
 
     // Handle incoming MQTT messages
@@ -111,17 +119,15 @@ export class Devices extends Component {
         return parts[parts.length - 1];
     }
 
-    handleNavigationToNewDevice = () => {
-        this.navigationToNewDevice = true;
-    };
-
     render() {
         const { data } = this.state;
         const connecting = this.connecting;
         return (
             <div>
                 <Navigation />
-                <DevicesList devices={data}  onClick={this.handleClick} connecting={connecting} />
+                <div id="tools">
+                </div>
+                <DevicesList devices={data}  onClick={this.handleClick} connecting={connecting}/>
             </div>
         )
     }
@@ -147,10 +153,8 @@ const DevicesList = ({ devices, onClick, connecting }) => {
                             <div className='device-info'>
                                 <p className='device-title'>{device.name}</p>
                                 <p className='device-text'>{device.type}</p>
-                                {device.status && (<p className='device-text' style={{ color: 'green' }}>Online</p>)}
-                                {!device.status && (<p className='device-text' style={{ color: 'red' }}>Offline</p>)}
-                                {/* {!device.IsOnline && !connecting && (<p className='device-text' style={{ color: 'red' }}>Offline</p>)}
-                                {connecting && !device.IsOnline && (<p className='device-text'>Connecting</p>)} */}
+                                {device.simulated && (<p className='device-text'><b>Simulation:</b> True</p>)}
+                                {!device.simulated && (<p className='device-text'><b>Simulation:</b> False</p>)}
                             </div>
                         </div>
                     ))}

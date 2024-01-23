@@ -45,7 +45,7 @@ def gyro_callback(accel, gyro, publish_event, gyro_settings, verbose=False):
 
     accel_payloads = []
     gyro_payloads = []
-    axis = ["x", "y", "c"]
+    axis = ["x", "y", "z"]
     for i in range(3):
         accel_payload = {
             "measurement": "Acceleration",

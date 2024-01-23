@@ -1,11 +1,15 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
 import json
 
+import settings
+
 
 app = Flask(__name__)
+CORS(app)
 
 
 # InfluxDB Configuration
@@ -57,21 +61,14 @@ def save_to_db(topic, data):
         )
     write_api.write(bucket=bucket, org=org, record=point)
 
-
-def handle_influx_query(query):
-    try:
-        query_api = influxdb_client.query_api()
-        tables = query_api.query(query, org=org)
-
-        container = []
-        for table in tables:
-            for record in table.records:
-                container.append(record.values)
-
-        return jsonify({"status": "success", "data": container})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+@app.route('/api/devices/<pi_id>', methods=['GET'])
+@cross_origin()
+def get_devices(pi_id):
+    id = pi_id[-1]
+    data = settings.load_settings("../settings" + id + ".json")
+    device_list = list(data.values())
+    return device_list
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,  port=8000)

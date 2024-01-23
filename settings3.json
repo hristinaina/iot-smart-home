@@ -4,28 +4,32 @@
     "simulated": true,
     "pin": 5,
     "runs_on": "PI3",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Bedroom Buzzer"
   },
   "RPIR4": {
     "name": "RPIR4",
     "simulated": true,
     "pin": 19,
     "runs_on": "PI3",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Room PIR"
   },
   "RDHT4": {
     "name": "RDHT4",
     "simulated": true,
     "pin": 6,
     "runs_on": "PI3",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Room DHT"
   },
   "BIR": {
     "name": "BIR",
     "simulated": true,
     "pin": 13,
     "runs_on": "PI3",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Bedroom Infrared"
   },
     "BRGB": {
     "name": "BRGB",
@@ -34,7 +38,8 @@
     "blue_pin": 12,
     "green_pin": 26,
     "runs_on": "PI3",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Bedroom RGB"
   },
     "B4SD": {
     "name": "B4SD",
@@ -42,6 +47,7 @@
     "segments": [11,4,23,8,7,10,18,25],
     "digits": [22,27,17,24],
     "runs_on": "PI3",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Bedroom 4 Digit 7 Segment Display"
   }
 }

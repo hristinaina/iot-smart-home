@@ -4,14 +4,16 @@
     "simulated": true,
     "pin": 26,
     "runs_on": "PI1",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Room DHT"
   },
   "DHT2": {
     "name": "RDH2",
     "simulated": true,
     "pin": 6,
     "runs_on": "PI1",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Room DHT"
   },
   "DUS1": {
     "name": "DUS1",
@@ -20,35 +22,40 @@
     "trig_pin": 24,
     "max_iter": 100,
     "runs_on": "PI1",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Door Ultrasonic Sensor"
   },
   "RPIR1": {
     "name": "RPIR1",
     "simulated": true,
     "pin": 10,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Room PIR"
   },
   "RPIR2": {
     "name": "RPIR2",
     "simulated": true,
     "pin": 3,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Room PIR"
   },
   "DPIR1": {
     "name": "DPIR1",
     "simulated": true,
     "pin": 17,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Motion Sensor"
   },
   "DS1": {
     "name": "DS1",
     "simulated": true,
     "pin": 27,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Sensor (Button)"
   },
   "DMS": {
     "name": "DMS",
@@ -62,20 +69,23 @@
     "C3": 20,
     "C4": 21,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Membrane Switch"
   },
   "DB": {
     "name": "DB",
     "simulated": true,
     "pin": 5,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Buzzer"
   },
   "DL": {
     "name": "DL",
     "simulated": true,
     "pin": 22,
     "runs_on": "PI1",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Light (LED diode)"
   }
 }
