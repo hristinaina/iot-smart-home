@@ -1,6 +1,30 @@
 import time
 
 import RPi.GPIO as GPIO
+import paho.mqtt.client as mqtt
+
+delay = 0.001
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe("front-bb-on")
+    client.subscribe("front-bb-off")
+
+def update_data(topic, data):
+    global delay
+    print("bb data: ", data, "received from topic " + topic)
+    if topic == "front-bb-on":
+        delay = 0.5
+    elif topic == "front-bb-off":
+        delay = 0.001
+
+def connect_mqtt():
+    # MQTT Configuration
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = lambda client, userdata, msg: update_data(msg.topic, json.loads(msg.payload.decode('utf-8')))
+
 
 class B4SD:
     def __init__(self, settings):
@@ -40,12 +64,13 @@ class B4SD:
                 else:
                     GPIO.output(25, 0)
             GPIO.output(self.digits[digit], 0)
-            time.sleep(0.001)
+            time.sleep(delay)
             GPIO.output(self.digits[digit], 1)
         return "{}:{}".format(n[0:2], n[2:])
 
 
 def run_b4sd_loop(b4sd, delay, callback, stop_event, publish_event, settings):
+    connect_mqtt()
     while True:
         value = b4sd.show_value()
         callback(value, publish_event, settings)

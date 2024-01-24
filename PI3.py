@@ -21,6 +21,7 @@ except:
 
 bb_alarm_time = "21:39"
 buzzer_stop_event = threading.Event()
+mqtt_client = mqtt.Client()
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("front-bb")
@@ -36,7 +37,7 @@ def update_data(topic, data):
 
 def connect_mqtt():
     # MQTT Configuration
-    mqtt_client = mqtt.Client()
+    global mqtt_client
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.loop_start()
     mqtt_client.on_connect = on_connect
@@ -44,6 +45,7 @@ def connect_mqtt():
 
 
 def run_alarm_clock(bb_settings, threads, buzzer_stop_event):
+    global mqtt_client
     is_active = False
     time_difference = timedelta(seconds=7)
     while True:
@@ -58,6 +60,7 @@ def run_alarm_clock(bb_settings, threads, buzzer_stop_event):
             buzzer_stop_event.clear()
             run_buzzer(bb_settings, threads, buzzer_stop_event)
             is_active = True
+            mqtt_client.publish("front-bb-on", json.dumps({"time": ""}))
         if buzzer_stop_event.is_set():
             is_active = False
         sleep(5)
