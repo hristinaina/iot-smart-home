@@ -10,7 +10,7 @@ from components.pir import run_pir
 from components.buzzer import run_buzzer
 import paho.mqtt.client as mqtt
 import json
-from datetime import datetime, time
+from datetime import datetime, timedelta
 from time import sleep
 
 try:
@@ -20,14 +20,19 @@ except:
     pass
 
 bb_alarm_time = "21:39"
+buzzer_stop_event = threading.Event()
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("front-bb")
+    client.subscribe("front-bb-off")
 
 def update_data(topic, data):
-    global bb_alarm_time
     print("bb data: ", data, "received from topic " + topic)
-    bb_alarm_time = data["time"]
+    if topic == "front-bb":
+        global bb_alarm_time
+        bb_alarm_time = data["time"]
+    elif topic == "front-bb-off":
+        buzzer_stop_event.set()
 
 def connect_mqtt():
     # MQTT Configuration
@@ -40,18 +45,22 @@ def connect_mqtt():
 
 def run_alarm_clock(bb_settings, threads, buzzer_stop_event):
     is_active = False
+    time_difference = timedelta(seconds=7)
     while True:
         target_time = datetime.strptime(bb_alarm_time, "%H:%M").time()
-        formatted_time = datetime.now().time().strftime("%H:%M")
-        current_time = datetime.strptime(formatted_time, "%H:%M").time()
-        if current_time == target_time and not is_active:
+        current_time = datetime.now().time()
+
+        delta_target_time = datetime.combine(datetime.today(), target_time)
+        delta_target_time = delta_target_time + time_difference
+        max_target_time = delta_target_time.time()
+
+        if target_time <= current_time <= max_target_time and not is_active:
+            buzzer_stop_event.clear()
             run_buzzer(bb_settings, threads, buzzer_stop_event)
             is_active = True
         if buzzer_stop_event.is_set():
-            buzzer_stop_event.clear()
             is_active = False
         sleep(5)
-        # dodati neki opseg od 10-15 sekundi unutar kojih se moze aktivirati alarm. Sekunde su uvijek 00 pa onda je lako ovo provjeriti
 
 
 def menu():
@@ -70,7 +79,6 @@ if __name__ == "__main__":
     threads = []
 
     stop_event = threading.Event()
-    buzzer_stop_event = threading.Event()
     try:
         rdht4_settings = settings['RDHT4']
         rpir4_settings = settings['RPIR4']

@@ -19,7 +19,7 @@ const BBDialog = ({ open, onClose, device }) => {
       else setIsButtonDisabled(true);
 
       const fetchTimeData = async () => {
-        let result = await DeviceService.getAlarmTime();
+        let result = await DeviceService.getAlarmClock();
         if (result) {
           setTimeValue(result.time);
         }
@@ -35,16 +35,16 @@ const BBDialog = ({ open, onClose, device }) => {
     setTimeValue(event.target.value);
   };
 
-  const handleTurnOff = () => {
-    // todo: handle turning off logic
+  const handleTurnOff = async () => {
+    await DeviceService.turnOffAlarmClock();
+    setIsButtonDisabled(true);
     console.log('Turning off...');
-    onClose();
   };
 
   const handleSave = async () => {
     console.log('Selected time:', timeValue);
     console.log(device);
-    await DeviceService.updateAlarmTime(timeValue);
+    await DeviceService.updateAlarmClock(timeValue);
     onClose();
   };
 

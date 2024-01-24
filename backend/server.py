@@ -131,6 +131,18 @@ def set_alarm_clock():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/turnOffAlarmClock', methods=['GET'])
+@cross_origin()
+def turn_off_alarm_clock():
+    try:
+        print("turn off alarm clock")
+        bb_topic = "front-bb-off"
+        payload = json.dumps({"time": ""})
+        mqtt_client.publish(bb_topic, payload)
+        return jsonify({'message': 'Alarm time turned off successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True,  port=8000)
