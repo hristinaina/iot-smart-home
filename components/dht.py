@@ -49,7 +49,8 @@ def dht_callback(humidity, temperature, publish_event, dht_settings, code="DHTLI
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
         "field_name": dht_settings["field_name"],
-        "value": temperature
+        "value": temperature,
+        "is_last": False
     }
 
     humidity_payload = {
@@ -58,10 +59,14 @@ def dht_callback(humidity, temperature, publish_event, dht_settings, code="DHTLI
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
         "field_name": dht_settings["field_name"],
-        "value": humidity
+        "value": humidity,
+        "is_last": False
     }
 
     with counter_lock:
+        if publish_data_counter + 1 >= publish_data_limit:
+            humidity_payload["is_last"] = True
+            temp_payload["is_last"] = True
         dht_batch.append(('data/temperature', json.dumps(temp_payload), 0, True))
         dht_batch.append(('data/humidity', json.dumps(humidity_payload), 0, True))
         publish_data_counter += 1

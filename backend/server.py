@@ -1,12 +1,18 @@
 import threading
 import time
+
+from flask_socketio import SocketIO
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
 import json
+import settings
 
 app = Flask(__name__)
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="http://localhost:3001", async_mode='threading')
 
 # InfluxDB Configuration
 token = "test_token"
@@ -14,6 +20,7 @@ org = "test_org"
 url = "http://localhost:8086"
 bucket = "test_bucket"
 influxdb_client = InfluxDBClient(url=url, token=token, org=org)
+
 
 # MQTT Configuration
 mqtt_client = mqtt.Client()
@@ -32,13 +39,28 @@ last_correct_pin = 0
 
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
-#              Acceleration, Gyroscope
+#              Acceleration, Gyroscope, Infrared, Time_b4sd
 # Topic names: data/temperature, data/humidity, data/pir, data/button, data/buzzer, data/light, data/ms, data/uds,
-#              data/acceleration, data/gyroscope
+#              data/acceleration, data/gyroscope, data/ir, data/b4sd
 
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("data/+")
+
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected successfully\n')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected successfully\n')
+
+def send_data_to_client(data):
+    try:
+        socketio.emit('data/'+data["runs_on"], {'message': data})
+        print("Data sent to topic: data/" + data["runs_on"])
+    except Exception as e:
+        print(e)
 
 
 mqtt_client.on_connect = on_connect
@@ -232,7 +254,21 @@ def save_to_db(topic, data):
         )
     write_api.write(bucket=bucket, org=org, record=point)
     command_callback(data)
+    try:
+        if data["is_last"]:
+            send_data_to_client(data)
+    except Exception as e:
+        print(e)
 
+
+
+@app.route('/api/devices/<pi_id>', methods=['GET'])
+@cross_origin()
+def get_devices(pi_id):
+    id = pi_id[-1]
+    data = settings.load_settings("../settings" + id + ".json")
+    device_list = list(data.values())
+    return device_list
 
 def handle_influx_query(query):
     try:
@@ -254,4 +290,4 @@ if __name__ == '__main__':
     ds_watchdog.daemon = True
     ds_watchdog.start()
 
-    app.run(debug=True)
+    app.run(debug=True,  port=8000)

@@ -41,6 +41,7 @@ def menu():
     print("=" * 10 + "  MENU  " + "=" * 10)
     print("-- Enter B to activate buzzer --")
     print("-- Enter D to deactivate buzzer --")
+    print("-- Enter L to change light state --")
     print("-- Enter X to stop all devices --")
     print("=" * 30)
 

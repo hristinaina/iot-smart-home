@@ -4,7 +4,8 @@
     "simulated": true,
     "pin": 26,
     "runs_on": "PI2",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Garage DHT"
   },
   "GLCD": {
     "name": "GLCD",
@@ -13,14 +14,16 @@
     "pin_e": 24,
     "pins_db":  [23, 17, 21, 22],
     "runs_on": "PI2",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Garage LCD"
   },
   "RDHT3": {
     "name": "RDHT3",
     "simulated": true,
     "pin": 6,
     "runs_on": "PI2",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Room DHT"
   },
   "DUS2": {
     "name": "DUS2",
@@ -29,33 +32,38 @@
     "trig_pin": 16,
     "max_iter": 100,
     "runs_on": "PI2",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Door Ultrasonic Sensor"
   },
   "RPIR3": {
     "name": "RPIR3",
     "simulated": true,
     "pin": 10,
     "runs_on": "PI2",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Room PIR"
   },
   "DPIR2": {
     "name": "DPIR2",
     "simulated": true,
     "pin": 3,
     "runs_on": "PI2",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Motion Sensor"
   },
   "DS2": {
     "name": "DS2",
     "simulated": true,
     "pin": 27,
     "runs_on": "PI2",
-    "field_name": "status"
+    "field_name": "status",
+    "type": "Door Sensor (Button)"
   },
   "GSG": {
     "name": "GSG",
     "simulated": true,
     "runs_on": "PI2",
-    "field_name": "value"
+    "field_name": "value",
+    "type": "Gun Safe Gyro (Gyroscope)"
   }
 }
