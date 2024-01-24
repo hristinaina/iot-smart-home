@@ -23,7 +23,12 @@ in_house_count = 0
 is_alarm = False
 lock = threading.Lock()
 last_pressed_ds1 = 0
+last_released_ds1 = 0
 last_pressed_ds2 = 0
+last_released_ds2 = 0
+correct_pin = "1234"
+security_timestamp = time.time()
+last_correct_pin = 0
 
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
@@ -44,13 +49,25 @@ def ds_watchdog_function():
     global last_pressed_ds1
     global last_pressed_ds2
     global is_alarm
+    global security_timestamp
     while True:
-        if last_pressed_ds1 > 0 and time.time() - last_pressed_ds1 > 5:
+        if last_pressed_ds1 > 0 and time.time() - last_pressed_ds1 > 5 and last_released_ds1 <= last_pressed_ds1:
             with lock:
                 is_alarm = True
-        if last_pressed_ds2 > 0 and time.time() - last_pressed_ds2 > 5:
+        if last_pressed_ds2 > 0 and time.time() - last_pressed_ds2 > 5 and last_released_ds2 <= last_pressed_ds2:
             with lock:
                 is_alarm = True
+        if security_timestamp > time.time():
+            if (last_released_ds2 > last_pressed_ds2 and
+                    time.time() - max(last_pressed_ds2, last_released_ds2) > 5 and time.time() - last_correct_pin > 5):
+                with lock:
+                    is_alarm = True
+
+            if (last_released_ds1 > last_pressed_ds1 and
+                    time.time() - max(last_pressed_ds1, last_released_ds1) > 5 and time.time() - last_correct_pin > 5):
+                with lock:
+                    is_alarm = True
+
         time.sleep(1)
 
 
@@ -104,7 +121,7 @@ def check_safe_movement(data):
 
             point = (
                 Point("Alarm")
-                .tag("name", "overall")
+                .tag("name", "triggered")
                 .field("Is_alarm", "on" if is_alarm else "off")
             )
         write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
@@ -120,7 +137,7 @@ def rpir_raise_alarm():
                 is_alarm = True
             point = (
                 Point("Alarm")
-                .tag("name", "overall")
+                .tag("name", "triggered")
                 .field("Is_alarm", "on" if is_alarm else "off")
             )
         write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
@@ -128,15 +145,50 @@ def rpir_raise_alarm():
 
 
 def ds_adjust_time(data, device_number=1):
-    last_pressed = 0 if data["value"] == "released" else time.time()
-    if device_number == 1:
-        with lock:
-            global last_pressed_ds1
-            last_pressed_ds1 = last_pressed if last_pressed_ds1 == 0 else last_pressed_ds1
+    if data["value"] == "pressed":
+        if device_number == 1:
+            with lock:
+                global last_pressed_ds1
+                last_pressed_ds1 = time.time()
+        else:
+            with lock:
+                global last_pressed_ds2
+                last_pressed_ds2 = time.time()
     else:
-        with lock:
-            global last_pressed_ds2
-            last_pressed_ds2 = last_pressed if last_pressed_ds2 == 0 else last_pressed_ds2
+        if device_number == 1:
+            with lock:
+                global last_released_ds1
+                last_released_ds1 = time.time()
+        else:
+            with lock:
+                global last_released_ds2
+                last_released_ds2 = time.time()
+
+
+def handle_pin_input(pin):
+    with app.app_context():
+        if pin == correct_pin:
+            global is_alarm
+            global security_timestamp
+            if is_alarm:
+                is_alarm = False
+            if security_timestamp == 0:
+                with lock:
+                    security_timestamp = time.time() + 10
+            else:
+                with lock:
+                    security_timestamp = 0
+
+            with lock:
+                global last_correct_pin
+                last_correct_pin = time.time()
+                point = (
+                    Point("Alarm")
+                    .tag("name", "active")
+                    .field("Is_alarm", "on" if security_timestamp > 0 else "off")
+                )
+            write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+            write_api.write(bucket=bucket, org=org, record=point)
 
 
 def command_callback(data):
@@ -154,6 +206,8 @@ def command_callback(data):
         ds_adjust_time(data)
     if data["name"] == "DS2":
         ds_adjust_time(data, 2)
+    if data["name"] == "DMS":
+        handle_pin_input(data["value"])
 
 
 def save_to_db(topic, data):
