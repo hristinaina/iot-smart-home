@@ -1,3 +1,5 @@
+import threading
+
 from flask import Flask, jsonify, request
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -17,9 +19,9 @@ influxdb_client = InfluxDBClient(url=url, token=token, org=org)
 mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 0)
 mqtt_client.loop_start()
-in_house = 0
+in_house_count = 0
 is_alarm = False
-
+lock = threading.Lock()
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
 #              Acceleration, Gyroscope
@@ -45,28 +47,29 @@ def adjust_people_count(device_number=1):
         values_list = [item["_value"] for item in values]
         gain = sum([j - i for i, j in zip(values_list[:-1], values_list[1:])])
 
-        global in_house
-        if len(values) > 0:
-            if gain > 0:
-                in_house += 1
-            elif gain < 0:
-                in_house -= 1
-            if in_house < 0:
-                in_house = 0
+        with lock:
+            global in_house_count
+            if len(values) > 0:
+                if gain > 0:
+                    in_house_count += 1
+                elif gain < 0:
+                    in_house_count -= 1
+                if in_house_count < 0:
+                    in_house_count = 0
 
-        point = (
-            Point("People_count")
-            .tag("name", "overall")
-            .field("population", in_house)
-        )
+            point = (
+                Point("People_count")
+                .tag("name", "overall")
+                .field("population", in_house_count)
+            )
         write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
         write_api.write(bucket=bucket, org=org, record=point)
 
 
-def check_movement(data):
+def check_safe_movement(data):
     with app.app_context():
         axis =str( data["axis"])
-        global is_alarm
+
         query = ('from(bucket: "test_bucket") |> range(start: -10s, stop: now())'
                  '|> filter(fn: (r) => r["_measurement"] == "Gyroscope")'
                  '|> filter(fn: (r) => r["name"] == "GSG")'
@@ -75,40 +78,48 @@ def check_movement(data):
                  '|> yield(name: "last")')
         response = handle_influx_query(query)
         values = json.loads(response.data.decode('utf-8'))['data']
-        if len(values)>0:
-            diff =abs( values[0]["_value"] - data["value"])
-            if diff >10:
-                is_alarm = True
+        with lock:
+            global is_alarm
+            if len(values)>0:
+                diff =abs( values[0]["_value"] - data["value"])
+                if diff >10:
+                    is_alarm = True
 
+            point = (
+                Point("Alarm")
+                .tag("name", "overall")
+                .field("Is_alarm", "on" if is_alarm else "off")
+            )
+        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+        write_api.write(bucket=bucket, org=org, record=point)
+
+
+def rpir_raise_alarm():
+    with lock:
+        global is_alarm
+        global in_house_count
+        if in_house_count == 0:
+            is_alarm = True
         point = (
             Point("Alarm")
             .tag("name", "overall")
             .field("Is_alarm", "on" if is_alarm else "off")
         )
-        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
-        write_api.write(bucket=bucket, org=org, record=point)
-
+    write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+    write_api.write(bucket=bucket, org=org, record=point)
 
 
 def command_callback(data):
-    # if data["measurement"] == "Buzzer_active":
-    #     if data["value"] == "on":
-    #         mqtt_client.publish("pi1", json.dumps({"trigger": "B"}))
-    #     elif data["value"] == "off":
-    #         mqtt_client.publish("pi1", json.dumps({"trigger": "D"}))
-    # elif data["measurement"] == "Light_status":
-    #     if data["value"] == "on":
-    #         mqtt_client.publish("pi1", json.dumps({"trigger": "L"}))
-    #     elif data["value"] == "off":
-    #         mqtt_client.publish("pi1", json.dumps({"trigger": "X"}))
-
     if data["name"] == "DPIR1" and data['value'] == "detected":
         mqtt_client.publish("pi1", json.dumps({"trigger": "L"}))
         adjust_people_count()
     if data["name"] == "DPIR2" and data['value'] == "detected":
         adjust_people_count(2)
     if data["name"] == "GSG":
-        check_movement(data)
+        check_safe_movement(data)
+    if data['value'] == "detected" and (data["name"] == "RPIR1" or data["name"] == "RPIR2" or data["name"] == "RPIR3" or data["name"] == "RPIR4"):
+        rpir_raise_alarm()
+
 
 
 def save_to_db(topic, data):
