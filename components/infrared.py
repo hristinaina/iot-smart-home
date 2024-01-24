@@ -47,10 +47,13 @@ def ir_callback(key, publish_event, ir_settings, verbose=False):
         "runs_on": ir_settings["runs_on"],
         "name": ir_settings["name"],
         "field_name": ir_settings["field_name"],
-        "value": key
+        "value": key,
+        "is_last": False
     }
 
     with counter_lock:
+        if publish_data_counter + 1 >= publish_data_limit:
+            payload["is_last"] = True
         ir_batch.append(('data/ir', json.dumps(payload), 0, True))
         publish_data_counter += 1
 

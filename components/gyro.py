@@ -54,7 +54,8 @@ def gyro_callback(accel, gyro, publish_event, gyro_settings, verbose=False):
             "name": gyro_settings["name"],
             "field_name": gyro_settings["field_name"],
             "axis": axis[i],
-            "value": round(accel[i], 2)
+            "value": round(accel[i], 2),
+            "is_last": False
         }
         gyro_payload = {
             "measurement": "Gyroscope",
@@ -63,15 +64,20 @@ def gyro_callback(accel, gyro, publish_event, gyro_settings, verbose=False):
             "name": gyro_settings["name"],
             "field_name": gyro_settings["field_name"],
             "axis": axis[i],
-            "value": round(gyro[i], 2)
+            "value": round(gyro[i], 2),
+            "is_last": False
         }
         accel_payloads.append(accel_payload)
         gyro_payloads.append(gyro_payload)
 
     with counter_lock:
         for payload in accel_payloads:
+            if publish_data_counter + 1 >= publish_data_limit:
+                payload["is_last"] = True
             gyro_batch.append(('data/acceleration', json.dumps(payload), 0, True))
         for payload in gyro_payloads:
+            if publish_data_counter + 1 >= publish_data_limit:
+                payload["is_last"] = True
             gyro_batch.append(('data/gyroscope', json.dumps(payload), 0, True))
         publish_data_counter += 1
 

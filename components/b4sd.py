@@ -49,10 +49,13 @@ def b4sd_callback(time_value, publish_event, b4sd_settings, verbose=False):
         "runs_on": b4sd_settings["runs_on"],
         "name": b4sd_settings["name"],
         "field_name": b4sd_settings["field_name"],
-        "value": time_value
+        "value": time_value,
+        "is_last": False
     }
 
     with counter_lock:
+        if publish_data_counter + 1 >= publish_data_limit:
+            payload["is_last"] = True
         b4sd_batch.append(('data/b4sd', json.dumps(payload), 0, True))
         publish_data_counter += 1
 

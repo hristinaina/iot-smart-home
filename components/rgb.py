@@ -48,10 +48,13 @@ def rgb_callback(status, publish_event, rgb_settings, verbose=False):
         "runs_on": rgb_settings["runs_on"],
         "name": rgb_settings["name"],
         "field_name": rgb_settings["field_name"],
-        "value": status
+        "value": status,
+        "is_last": False
     }
 
     with counter_lock:
+        if publish_data_counter + 1 >= publish_data_limit:
+            payload["is_last"] = True
         rgb_batch.append(('data/rgb', json.dumps(payload), 0, True))
         publish_data_counter += 1
 

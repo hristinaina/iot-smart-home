@@ -76,7 +76,11 @@ def save_to_db(topic, data):
             .field(data["field_name"], data["value"])
         )
     write_api.write(bucket=bucket, org=org, record=point)
-    send_data_to_client(data)
+    try:
+        if data["is_last"]:
+            send_data_to_client(data)
+    except Exception as e:
+        print(e)
 
 
 @app.route('/api/devices/<pi_id>', methods=['GET'])
