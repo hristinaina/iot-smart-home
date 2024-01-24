@@ -5,6 +5,7 @@ import { Navigation } from './Navigation';
 import DeviceService from '../services/DeviceService'
 import io from 'socket.io-client';
 import RGBDialog from './RGBDialog';
+import DMSDialog from './DMSDialog';
 
 export class Devices extends Component {
     connected = false;
@@ -14,6 +15,7 @@ export class Devices extends Component {
         this.state = {
             data: [],
             isColorDialogOpen: false,
+            isDMSDialogOpen: false,
             selectedDevice: null,
         };
         this.pi =this.extractPIFromUrl();
@@ -227,6 +229,19 @@ export class Devices extends Component {
         this.setState({ isColorDialogOpen: false, selectedDevice: null });
       };
 
+    openDMSDialog = (device) => {
+        // Open the color dialog and set the selected device
+        this.setState({ isDMSDialogOpen: true, selectedDevice: device }, () => {
+          // The callback ensures that the state has been updated before proceeding
+          console.log("Selected Device:", this.state.selectedDevice);
+        });
+      };
+    
+    closeDMSDialog = () => {
+        // Close the color dialog and reset the selected device
+        this.setState({ isDMSDialogOpen: false, selectedDevice: null });
+      };
+
     render() {
         const { data } = this.state;
         const showAlarm = this.showAlarm;
@@ -238,13 +253,16 @@ export class Devices extends Component {
                 <RGBDialog open={this.state.isColorDialogOpen}
                             onClose={this.closeColorDialog}
                             device={this.state.selectedDevice}/>
-                <DevicesList devices={data} openColorDialog={this.openColorDialog}/>
+                <DMSDialog open={this.state.isDMSDialogOpen}
+                            onClose={this.closeDMSDialog}
+                            device={this.state.selectedDevice}/>
+                <DevicesList devices={data} openColorDialog={this.openColorDialog} openDMSDialog={this.openDMSDialog}/>
             </div>
         )
     }
 }
 
-const DevicesList = ({ devices, openColorDialog }) => {
+const DevicesList = ({ devices, openColorDialog, openDMSDialog }) => {
     const chunkSize = 5; // Number of items per row
 
     const chunkArray = (arr, size) => {
@@ -274,7 +292,7 @@ const DevicesList = ({ devices, openColorDialog }) => {
                                 {device.name == "GSG" && (<p className='device-text'><b>Gyroscope: </b>{device.valueGX}, {device.valueGY}, {device.valueGZ}</p>)}
                                 {device.type.slice(-3) != "DHT" && device.name != "GSG" && device.name != "GLCD" && (<p className='device-text'><b>{device.measurement}: </b>{device.value}</p>)}
                                 {device.name == "BRGB" && (<p className='device-text'><button className='card-button' onClick={() => openColorDialog(device)}>Change Light</button></p>)}
-                                {device.name == "DMS" && (<p className='device-text'><button className='card-button'>Enter pin</button></p>)}
+                                {device.name == "DMS" && (<p className='device-text'><button className='card-button'  onClick={() => openDMSDialog(device)}>Enter pin</button></p>)}
                             </div>
                         </div>
                     ))}
