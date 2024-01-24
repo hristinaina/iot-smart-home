@@ -76,10 +76,13 @@ def button_released(publish_event, dht_settings, verbose=False):
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
         "field_name": dht_settings["field_name"],
-        "value": "released"
+        "value": "released",
+        "is_last": False
     }
 
     with counter_lock:
+        if publish_data_counter + 1 >= publish_data_limit:
+            payload["is_last"] = True
         button_batch.append(('data/button', json.dumps(payload), 0, True))
         publish_data_counter += 1
 

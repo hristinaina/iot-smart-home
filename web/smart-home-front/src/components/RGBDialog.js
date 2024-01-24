@@ -16,7 +16,17 @@ const RGBDialog = ({ open, onClose, device }) => {
 
   useEffect(() => {
     if (open && device) {
-      setSelectedColor(device.value);
+      const colorMapping = {
+        'red': 1,
+        'green': 2,
+        'blue': 3,
+        'lightBlue': 5,
+        'yellow': 4,
+        'purple': 6,
+        'white': 7,
+        'off': 0,
+      };
+      setSelectedColor(colorMapping[device.value]);
     }
   }, [open]);
 

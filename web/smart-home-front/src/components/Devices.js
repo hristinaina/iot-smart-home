@@ -6,6 +6,7 @@ import DeviceService from '../services/DeviceService'
 import io from 'socket.io-client';
 import RGBDialog from './RGBDialog';
 import DMSDialog from './DMSDialog';
+import BBDialog from './BBDialog';
 
 export class Devices extends Component {
     connected = false;
@@ -16,6 +17,7 @@ export class Devices extends Component {
             data: [],
             isColorDialogOpen: false,
             isDMSDialogOpen: false,
+            isBBDialogOpen: false,
             selectedDevice: null,
         };
         this.pi =this.extractPIFromUrl();
@@ -241,6 +243,19 @@ export class Devices extends Component {
         // Close the color dialog and reset the selected device
         this.setState({ isDMSDialogOpen: false, selectedDevice: null });
       };
+    
+    openBBDialog = (device) => {
+        // Open the color dialog and set the selected device
+        this.setState({ isBBDialogOpen: true, selectedDevice: device }, () => {
+          // The callback ensures that the state has been updated before proceeding
+          console.log("Selected Device:", this.state.selectedDevice);
+        });
+      };
+    
+    closeBBDialog = () => {
+        // Close the color dialog and reset the selected device
+        this.setState({ isBBDialogOpen: false, selectedDevice: null });
+      };
 
     render() {
         const { data } = this.state;
@@ -256,13 +271,16 @@ export class Devices extends Component {
                 <DMSDialog open={this.state.isDMSDialogOpen}
                             onClose={this.closeDMSDialog}
                             device={this.state.selectedDevice}/>
-                <DevicesList devices={data} openColorDialog={this.openColorDialog} openDMSDialog={this.openDMSDialog}/>
+                <BBDialog open={this.state.isBBDialogOpen}
+                            onClose={this.closeBBDialog}
+                            device={this.state.selectedDevice}/>
+                <DevicesList devices={data} openColorDialog={this.openColorDialog} openDMSDialog={this.openDMSDialog} openBBDialog={this.openBBDialog}/>
             </div>
         )
     }
 }
 
-const DevicesList = ({ devices, openColorDialog, openDMSDialog }) => {
+const DevicesList = ({ devices, openColorDialog, openDMSDialog, openBBDialog }) => {
     const chunkSize = 5; // Number of items per row
 
     const chunkArray = (arr, size) => {
@@ -293,6 +311,7 @@ const DevicesList = ({ devices, openColorDialog, openDMSDialog }) => {
                                 {device.type.slice(-3) != "DHT" && device.name != "GSG" && device.name != "GLCD" && (<p className='device-text'><b>{device.measurement}: </b>{device.value}</p>)}
                                 {device.name == "BRGB" && (<p className='device-text'><button className='card-button' onClick={() => openColorDialog(device)}>Change Light</button></p>)}
                                 {device.name == "DMS" && (<p className='device-text'><button className='card-button'  onClick={() => openDMSDialog(device)}>Enter pin</button></p>)}
+                                {device.name == "BB" && (<p className='device-text'><button className='card-button'  onClick={() => openBBDialog(device)}>Edit alarm clock</button></p>)}
                             </div>
                         </div>
                     ))}
