@@ -122,7 +122,11 @@ def set_alarm_clock():
     try:
         data = request.json
         bb_alarm_time = data.get('time')
-        print(bb_alarm_time)
+        print("Alarm clock time changed to ", bb_alarm_time)
+
+        bb_topic = "front-bb"
+        payload = json.dumps({"time": bb_alarm_time})
+        mqtt_client.publish(bb_topic, payload)
         return jsonify({'message': 'Alarm time set successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

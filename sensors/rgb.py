@@ -116,6 +116,7 @@ def change_light(rgb):
 
 
 def run_rgb_loop(rgb, delay, callback, stop_event, publish_event, settings):
+    connect_mqtt()
     rgb.turnOff()
     while True:
         if new_action != rgb.status:
