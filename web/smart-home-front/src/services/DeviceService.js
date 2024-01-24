@@ -51,6 +51,23 @@ class DeviceService {
       throw error;
     }
   }
+  async inputPin(pin) {
+    try {
+      const response = await fetch('http://localhost:8000/api/inputPin', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pin }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  }
 
   async turnOffAlarmClock() {
     try {
