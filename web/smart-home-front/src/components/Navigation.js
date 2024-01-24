@@ -1,11 +1,11 @@
-import React , { useEffect, useRef  } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navbar, NavItem, NavLink } from 'reactstrap';
 import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
 
-export function Navigation() {
+export function Navigation({ showAlarm }) {
   const location = useLocation();
-
+  const [blink, setBlink] = useState(false);
   const prevPathnameRef = useRef(location.pathname);
 
   useEffect(() => {
@@ -19,11 +19,33 @@ export function Navigation() {
     prevPathnameRef.current = location.pathname;
   }, [location.pathname]);
 
+  useEffect(() => {
+    // Toggle the blink effect based on showAlarm prop
+    if (showAlarm) {
+      const intervalId = setInterval(() => {
+        setBlink((prevBlink) => !prevBlink);
+      }, 500); // Toggle every 500 milliseconds
+
+      return () => clearInterval(intervalId);
+    } else {
+      setBlink(false);
+    }
+  }, [showAlarm]);
+
   return (
     <header>
       <Navbar className="navbar">
         <ul>
           <span className="logo">Smart Home</span>
+          <NavItem>
+            <NavLink
+              tag={Link}
+              className={`text-light ${location.pathname === '/home' ? 'active' : ''}`}
+              to="/home"
+            >
+              Home
+            </NavLink>
+          </NavItem>
           <NavItem>
             <NavLink
               tag={Link}
@@ -51,6 +73,15 @@ export function Navigation() {
               PI3
             </NavLink>
           </NavItem>
+          {showAlarm && (
+            <>
+              <span id="alarm">
+                ALARM
+              </span>
+              <img src='/images/alarm.png' id='alarmImg' className={blink ? 'blink' : ''} />
+            </>
+          )}
+
         </ul>
       </Navbar>
     </header>

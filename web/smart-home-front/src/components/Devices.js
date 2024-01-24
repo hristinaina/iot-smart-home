@@ -16,6 +16,7 @@ export class Devices extends Component {
         this.connecting = false; //change to true if you want to use this
         this.pi =this.extractPIFromUrl();
         this.socket = null;
+        this.showAlarm = true;
     }
 
     async fetchData(){
@@ -236,9 +237,10 @@ export class Devices extends Component {
     render() {
         const { data } = this.state;
         const connecting = this.connecting;
+        const showAlarm = this.showAlarm;
         return (
             <div>
-                <Navigation />
+                <Navigation showAlarm={showAlarm}/>
                 <div id="tools">
                 </div>
                 <DevicesList devices={data}  onClick={this.handleClick} connecting={connecting}/>
