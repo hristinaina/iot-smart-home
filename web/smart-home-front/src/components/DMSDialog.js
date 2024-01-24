@@ -28,7 +28,6 @@ const DMSDialog = ({ open, onClose, device }) => {
       <DialogContent className='device-dialog'>
         <TextField
           fullWidth
-          label="Enter PIN"
           value={inputValue}
           onChange={handleInputChange}
         />
