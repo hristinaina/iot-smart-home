@@ -36,7 +36,7 @@ const RGBDialog = ({ open, onClose, device }) => {
 
   const handleSave = async () => {
     try {
-      const result = await DeviceService.updateRGBLight(selectedColor);
+      await DeviceService.updateRGBLight(selectedColor);
   } catch (error) {
       console.log("Error fetching data from the server");
       console.log(error);

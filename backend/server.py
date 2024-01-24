@@ -26,6 +26,7 @@ mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 60)
 mqtt_client.loop_start()
 
+bb_alarm_time = "21:39"
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
 #              Acceleration, Gyroscope, Infrared, Time_b4sd
@@ -104,6 +105,27 @@ def update_rgb(color):
     mqtt_client.publish(rgb_topic, payload)
     print("rgb change sent with mqtt")
     return payload
+
+
+@app.route('/api/getAlarmClock', methods=['GET'])
+@cross_origin()
+def get_alarm_clock():
+    print("api to get alarm clock")
+    payload = json.dumps({"time": bb_alarm_time})
+    return payload
+
+
+@app.route('/api/setAlarmClock', methods=['PUT'])
+@cross_origin()
+def set_alarm_clock():
+    global bb_alarm_time
+    try:
+        data = request.json
+        bb_alarm_time = data.get('time')
+        print(bb_alarm_time)
+        return jsonify({'message': 'Alarm time set successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

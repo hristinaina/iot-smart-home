@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import "./Dialog.css"
+import DeviceService from '../services/DeviceService';
 
 const BBDialog = ({ open, onClose, device }) => {
   const [timeValue, setTimeValue] = useState('');
@@ -16,7 +17,17 @@ const BBDialog = ({ open, onClose, device }) => {
       if (device.value=="activated")  setIsButtonDisabled(false);
       else if (device.value="deactivated") setIsButtonDisabled(true);
       else setIsButtonDisabled(true);
-       //todo trebace dobaviti vrijeme za alarm sa beka i prikazati ga
+
+      const fetchTimeData = async () => {
+        let result = await DeviceService.getAlarmTime();
+        if (result) {
+          setTimeValue(result.time);
+        }
+      };
+  
+      if (open) {
+        fetchTimeData();
+      }
     }
   }, [open]);
 
@@ -30,10 +41,10 @@ const BBDialog = ({ open, onClose, device }) => {
     onClose();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log('Selected time:', timeValue);
     console.log(device);
-    // todo: inform back application about the change
+    await DeviceService.updateAlarmTime(timeValue);
     onClose();
   };
 
