@@ -11,7 +11,7 @@ import settings
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="http://localhost:3001", async_mode='threading')
 
 # InfluxDB Configuration
 token = "test_token"
