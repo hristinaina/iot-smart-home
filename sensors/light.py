@@ -18,11 +18,15 @@ class light:
 
 
 def run_light_loop(pipe, light, delay, callback, stop_event, publish_event, settings):
+    last_light_time = time.time()
     while True:
-        message = pipe.recv()
-        message = str(message).strip().lower()
-        if message == "l":
-            light.switch_light()
+        if pipe.poll():
+            message = pipe.recv()
+            message = str(message).strip().lower()
+            if message == "l":
+                last_light_time = time.time()
+
+        light.is_on = time.time() - last_light_time <= 10
         callback(light.is_on, publish_event, settings)
         if stop_event.is_set():
             break

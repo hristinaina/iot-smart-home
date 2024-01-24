@@ -16,7 +16,7 @@ services:
         image: influxdb:2.7
         entrypoint: influx setup --bucket test_bucket -t test_token -o test_org --username=test_username --password=test_password --host=http://influxdb:8086 -f
         
-        restart: on-failure:20
+#        restart: on-failure:20
         depends_on:
             - influxdb
         networks:

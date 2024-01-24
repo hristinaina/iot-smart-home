@@ -1,5 +1,8 @@
+import json
 import multiprocessing
 import threading
+
+import paho.mqtt.client as mqtt
 
 from components.b4sd import run_b4sd
 from components.button import run_button
@@ -21,6 +24,30 @@ try:
     GPIO.setmode(GPIO.BCM)
 except:
     pass
+
+mqtt_client = mqtt.Client()
+mqtt_client.connect("localhost", 1883, 60)
+mqtt_client.loop_start()
+
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe("pi3")
+
+
+mqtt_client.on_connect = on_connect
+mqtt_client.on_message = lambda client, userdata, msg: user_inputs(json.loads(msg.payload.decode('utf-8')))
+
+
+def user_inputs(data):
+    while True:
+        if data["trigger"] == "B":
+            buzzer_stop_event.clear()
+            run_buzzer(bb_settings, threads, buzzer_stop_event)
+        elif data["trigger"] == "D":
+            buzzer_stop_event.set()
+        elif data["trigger"] == "X":
+            stop_event.set()
+            buzzer_stop_event.set()
 
 
 def menu():
@@ -53,16 +80,7 @@ if __name__ == "__main__":
         run_rgb(brgb_settings, threads, stop_event)
         run_b4sd(b4sd_settings, threads, stop_event)
 
-        while True:
-            user_input = input().strip().upper()
-            if user_input == "X":
-                stop_event.set()
-                buzzer_stop_event.set()
-            if user_input == "B":
-                buzzer_stop_event.clear()
-                run_buzzer(bb_settings, threads, buzzer_stop_event)
-            elif user_input == "D":
-                buzzer_stop_event.set()
+
 
     except KeyboardInterrupt:
         print('\nStopping app')
