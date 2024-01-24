@@ -278,6 +278,8 @@ const DevicesList = ({ devices, onClick, connecting }) => {
                                 {device.name == "GSG" && (<p className='device-text'><b>Acceleration: </b>{device.valueAX}, {device.valueAY}, {device.valueAZ}</p>)}
                                 {device.name == "GSG" && (<p className='device-text'><b>Gyroscope: </b>{device.valueGX}, {device.valueGY}, {device.valueGZ}</p>)}
                                 {device.type.slice(-3) != "DHT" && device.name != "GSG" && device.name != "GLCD" && (<p className='device-text'><b>{device.measurement}: </b>{device.value}</p>)}
+                                {device.name == "BRGB" && (<p className='device-text'><button className='card-button'>Change Light</button></p>)}
+                                {device.name == "DMS" && (<p className='device-text'><button className='card-button'>Enter pin</button></p>)}
                             </div>
                         </div>
                     ))}
