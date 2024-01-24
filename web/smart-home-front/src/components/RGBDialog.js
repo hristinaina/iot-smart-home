@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import DeviceService from '../services/DeviceService';
 import "./Dialog.css"
 
 const RGBDialog = ({ open, onClose, device }) => {
@@ -23,10 +24,13 @@ const RGBDialog = ({ open, onClose, device }) => {
     setSelectedColor(event.target.value);
   };
 
-  const handleSave = () => {
-    console.log('Selected color:', selectedColor);
-    console.log(device);
-    //todo inform back application abour the change
+  const handleSave = async () => {
+    try {
+      const result = await DeviceService.updateRGBLight(selectedColor);
+  } catch (error) {
+      console.log("Error fetching data from the server");
+      console.log(error);
+  }
     onClose();
   };
 
@@ -43,14 +47,14 @@ const RGBDialog = ({ open, onClose, device }) => {
             label="Select Color"
             onChange={handleColorChange}
           >
-            <MenuItem value="red">Red</MenuItem>
-            <MenuItem value="green">Green</MenuItem>
-            <MenuItem value="blue">Blue</MenuItem>
-            <MenuItem value="lightBlue">Light Blue</MenuItem>
-            <MenuItem value="yellow">Yellow</MenuItem>
-            <MenuItem value="purple">Purple</MenuItem>
-            <MenuItem value="white">White</MenuItem>
-            <MenuItem value="off">Off</MenuItem>
+            <MenuItem value="1">Red</MenuItem>
+            <MenuItem value="2">Green</MenuItem>
+            <MenuItem value="3">Blue</MenuItem>
+            <MenuItem value="5">Light Blue</MenuItem>
+            <MenuItem value="4">Yellow</MenuItem>
+            <MenuItem value="6">Purple</MenuItem>
+            <MenuItem value="7">White</MenuItem>
+            <MenuItem value="0">Off</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>

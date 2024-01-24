@@ -26,22 +26,22 @@ mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 60)
 mqtt_client.loop_start()
 
+
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
 #              Acceleration, Gyroscope, Infrared, Time_b4sd
 # Topic names: data/temperature, data/humidity, data/pir, data/button, data/buzzer, data/light, data/ms, data/uds,
 #              data/acceleration, data/gyroscope, data/ir, data/b4sd
 
 
-def on_connect(client, userdata, flags, rc):
-    client.subscribe("data/+")
-
 @socketio.on('connect')
 def handle_connect():
     print('Client connected successfully\n')
 
+
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected successfully\n')
+
 
 def send_data_to_client(data):
     try:
@@ -49,6 +49,10 @@ def send_data_to_client(data):
         print("Data sent to topic: data/" + data["runs_on"])
     except Exception as e:
         print(e)
+
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe("data/+")
 
 
 mqtt_client.on_connect = on_connect
@@ -90,6 +94,16 @@ def get_devices(pi_id):
     data = settings.load_settings("../settings" + id + ".json")
     device_list = list(data.values())
     return device_list
+
+
+@app.route('/api/updateRGB/<color>', methods=['GET'])
+@cross_origin()
+def update_rgb(color):
+    rgb_topic = "front-rgb"
+    payload = json.dumps({"value": color})
+    mqtt_client.publish(rgb_topic, payload)
+    print("rgb change sent with mqtt")
+    return payload
 
 
 if __name__ == '__main__':
