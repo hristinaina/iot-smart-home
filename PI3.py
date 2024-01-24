@@ -1,12 +1,15 @@
 import multiprocessing
 import threading
 
+from components.b4sd import run_b4sd
 from components.button import run_button
+from components.infrared import run_infrared
 from components.lcd import run_lcd
 from components.ms import run_ms
 from components.button import run_button
 from components.light import run_light
 from components.ms import run_ms
+from components.rgb import run_rgb
 from components.uds import run_uds
 from settings import load_settings
 from components.dht import run_dht
@@ -40,9 +43,15 @@ if __name__ == "__main__":
         rdht4_settings = settings['RDHT4']
         rpir4_settings = settings['RPIR4']
         bb_settings = settings['BB']
+        bir_settings = settings['BIR']
+        brgb_settings = settings['BRGB']
+        b4sd_settings = settings['B4SD']
 
         run_dht(rdht4_settings, threads, stop_event)
         run_pir(rpir4_settings, threads, stop_event)
+        run_infrared(bir_settings, threads, stop_event)
+        run_rgb(brgb_settings, threads, stop_event)
+        run_b4sd(b4sd_settings, threads, stop_event)
 
         while True:
             user_input = input().strip().upper()

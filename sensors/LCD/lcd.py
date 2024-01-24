@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
 
-from paho import mqtt
+import paho.mqtt.client as mqtt
 
 from PCF8574 import PCF8574_GPIO
 from Adafruit_LCD1602 import Adafruit_CharLCD

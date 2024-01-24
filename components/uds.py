@@ -47,10 +47,13 @@ def uds_callback(distance, publish_event, dht_settings, verbose=False):
         "runs_on": dht_settings["runs_on"],
         "name": dht_settings["name"],
         "field_name": dht_settings["field_name"],
-        "value": distance
+        "value": distance,
+        "is_last": False
     }
 
     with counter_lock:
+        if publish_data_counter + 1 >= publish_data_limit:
+            payload["is_last"] = True
         uds_batch.append(('data/uds', json.dumps(payload), 0, True))
         publish_data_counter += 1
 
