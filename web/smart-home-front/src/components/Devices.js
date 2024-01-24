@@ -4,6 +4,8 @@ import './Devices.css';
 import { Navigation } from './Navigation';
 import DeviceService from '../services/DeviceService'
 import io from 'socket.io-client';
+import RGBDialog from './RGBDialog';
+import DMSDialog from './DMSDialog';
 
 export class Devices extends Component {
     connected = false;
@@ -12,8 +14,10 @@ export class Devices extends Component {
         super(props);
         this.state = {
             data: [],
+            isColorDialogOpen: false,
+            isDMSDialogOpen: false,
+            selectedDevice: null,
         };
-        this.connecting = false; //change to true if you want to use this
         this.pi =this.extractPIFromUrl();
         this.socket = null;
         this.showAlarm = true;
@@ -212,44 +216,53 @@ export class Devices extends Component {
         return parts[parts.length - 1];
     }
 
-    //todo navigate to appropriate page
-    handleClick(device) {
-        if (device.Type === 'Ambient Sensor')
-            window.location.assign("/ambient-sensor/" + device.Id)
-        else if (device.Type === 'Air conditioner')
-            window.location.assign("/air-conditioner/" + device.Id)
-        else if (device.Type === 'Washing machine')
-            window.location.assign("/lamp/" + device.Id)
-        else if (device.Type === 'Lamp')
-            window.location.assign("/lamp/" + device.Id)
-        else if (device.Type === 'Vehicle gate')
-            window.location.assign("/lamp/" + device.Id)
-        else if (device.Type === 'Sprinkler')
-            window.location.assign("/lamp/" + device.Id)
-        else if (device.Type === 'Solar panel')
-            window.location.assign("/sp/" + device.Id)
-        else if (device.Type === 'Battery storage')
-            window.location.assign("/hb/" + device.Id)
-        else if (device.Type === 'Electric vehicle charger')
-            window.location.assign("/lamp/" + device.Id)
-    }
+    openColorDialog = (device) => {
+        // Open the color dialog and set the selected device
+        this.setState({ isColorDialogOpen: true, selectedDevice: device }, () => {
+          // The callback ensures that the state has been updated before proceeding
+          console.log("Selected Device:", this.state.selectedDevice);
+        });
+      };
+    
+    closeColorDialog = () => {
+        // Close the color dialog and reset the selected device
+        this.setState({ isColorDialogOpen: false, selectedDevice: null });
+      };
+
+    openDMSDialog = (device) => {
+        // Open the color dialog and set the selected device
+        this.setState({ isDMSDialogOpen: true, selectedDevice: device }, () => {
+          // The callback ensures that the state has been updated before proceeding
+          console.log("Selected Device:", this.state.selectedDevice);
+        });
+      };
+    
+    closeDMSDialog = () => {
+        // Close the color dialog and reset the selected device
+        this.setState({ isDMSDialogOpen: false, selectedDevice: null });
+      };
 
     render() {
         const { data } = this.state;
-        const connecting = this.connecting;
         const showAlarm = this.showAlarm;
         return (
             <div>
                 <Navigation showAlarm={showAlarm}/>
                 <div id="tools">
                 </div>
-                <DevicesList devices={data}  onClick={this.handleClick} connecting={connecting}/>
+                <RGBDialog open={this.state.isColorDialogOpen}
+                            onClose={this.closeColorDialog}
+                            device={this.state.selectedDevice}/>
+                <DMSDialog open={this.state.isDMSDialogOpen}
+                            onClose={this.closeDMSDialog}
+                            device={this.state.selectedDevice}/>
+                <DevicesList devices={data} openColorDialog={this.openColorDialog} openDMSDialog={this.openDMSDialog}/>
             </div>
         )
     }
 }
 
-const DevicesList = ({ devices, onClick, connecting }) => {
+const DevicesList = ({ devices, openColorDialog, openDMSDialog }) => {
     const chunkSize = 5; // Number of items per row
 
     const chunkArray = (arr, size) => {
@@ -265,7 +278,7 @@ const DevicesList = ({ devices, onClick, connecting }) => {
             {rows.map((row, rowIndex) => (
                 <div key={rowIndex} className='device-row'>
                     {row.map((device, index) => (
-                        <div key={index} className='device-card' onClick={() => onClick(device)}>
+                        <div key={index} className='device-card'>
                             <div className='device-info'>
                                 <p className='device-title'>{device.name}</p>
                                 <p className='device-text'>{device.type}</p>
@@ -278,8 +291,8 @@ const DevicesList = ({ devices, onClick, connecting }) => {
                                 {device.name == "GSG" && (<p className='device-text'><b>Acceleration: </b>{device.valueAX}, {device.valueAY}, {device.valueAZ}</p>)}
                                 {device.name == "GSG" && (<p className='device-text'><b>Gyroscope: </b>{device.valueGX}, {device.valueGY}, {device.valueGZ}</p>)}
                                 {device.type.slice(-3) != "DHT" && device.name != "GSG" && device.name != "GLCD" && (<p className='device-text'><b>{device.measurement}: </b>{device.value}</p>)}
-                                {device.name == "BRGB" && (<p className='device-text'><button className='card-button'>Change Light</button></p>)}
-                                {device.name == "DMS" && (<p className='device-text'><button className='card-button'>Enter pin</button></p>)}
+                                {device.name == "BRGB" && (<p className='device-text'><button className='card-button' onClick={() => openColorDialog(device)}>Change Light</button></p>)}
+                                {device.name == "DMS" && (<p className='device-text'><button className='card-button'  onClick={() => openDMSDialog(device)}>Enter pin</button></p>)}
                             </div>
                         </div>
                     ))}
