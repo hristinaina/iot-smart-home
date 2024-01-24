@@ -65,7 +65,7 @@ def run_infrared(settings, threads, stop_event):
     if settings['simulated']:
         print("Starting {} simulator".format(settings["name"]))
         ir_thread = threading.Thread(target=run_ir_simulator,
-                                      args=(5, ir_callback, stop_event, publish_event, settings))
+                                      args=(10, ir_callback, stop_event, publish_event, settings))
         ir_thread.start()
         threads.append(ir_thread)
         print("{0} simulator started".format(settings["name"]))
@@ -74,7 +74,7 @@ def run_infrared(settings, threads, stop_event):
         print("Starting {} loop".format(settings["name"]))
         ir = Infrared(settings["pin"], settings["name"])
         ir_thread = threading.Thread(target=run_ir_loop,
-                                      args=(ir, 5, ir_callback, stop_event, publish_event, settings))
+                                      args=(ir, 10, ir_callback, stop_event, publish_event, settings))
         ir_thread.start()
         threads.append(ir_thread)
         print("{} loop started".format(settings["name"]))

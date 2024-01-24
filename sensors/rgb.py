@@ -28,9 +28,11 @@ def map_key_to_color(key):
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("data/ir")
+    client.subscribe("front-rgb")
 
 def update_data(topic, data):
     global new_action
+    print("rgb data: ", data, "received from topic " + topic)
     new_action = map_key_to_color(data["value"])
 
 def connect_mqtt():
@@ -114,6 +116,7 @@ def change_light(rgb):
 
 
 def run_rgb_loop(rgb, delay, callback, stop_event, publish_event, settings):
+    connect_mqtt()
     rgb.turnOff()
     while True:
         if new_action != rgb.status:
