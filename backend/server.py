@@ -21,7 +21,6 @@ url = "http://localhost:8086"
 bucket = "test_bucket"
 influxdb_client = InfluxDBClient(url=url, token=token, org=org)
 
-
 # MQTT Configuration
 mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 0)
@@ -43,21 +42,39 @@ last_correct_pin = 0
 # Topic names: data/temperature, data/humidity, data/pir, data/button, data/buzzer, data/light, data/ms, data/uds,
 #              data/acceleration, data/gyroscope, data/ir, data/b4sd
 
+def alarm_set_on():
+    with lock:
+        global is_alarm
+        is_alarm = True
+        mqtt_client.publish("pi1", json.dumps({"trigger": "B"}))
+        mqtt_client.publish("pi3", json.dumps({"trigger": "B"}))
+
+
+def alarm_set_off():
+    with lock:
+        global is_alarm
+        is_alarm = False
+        mqtt_client.publish("pi1", json.dumps({"trigger": "D"}))
+        mqtt_client.publish("pi3", json.dumps({"trigger": "D"}))
+
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("data/+")
+
 
 @socketio.on('connect')
 def handle_connect():
     print('Client connected successfully\n')
 
+
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected successfully\n')
 
+
 def send_data_to_client(data):
     try:
-        socketio.emit('data/'+data["runs_on"], {'message': data})
+        socketio.emit('data/' + data["runs_on"], {'message': data})
         print("Data sent to topic: data/" + data["runs_on"])
     except Exception as e:
         print(e)
@@ -70,25 +87,21 @@ mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, jso
 def ds_watchdog_function():
     global last_pressed_ds1
     global last_pressed_ds2
-    global is_alarm
     global security_timestamp
     while True:
         if last_pressed_ds1 > 0 and time.time() - last_pressed_ds1 > 5 and last_released_ds1 <= last_pressed_ds1:
             with lock:
-                is_alarm = True
+                alarm_set_on()
         if last_pressed_ds2 > 0 and time.time() - last_pressed_ds2 > 5 and last_released_ds2 <= last_pressed_ds2:
             with lock:
-                is_alarm = True
+                alarm_set_on()
         if security_timestamp > time.time():
             if (last_released_ds2 > last_pressed_ds2 and
                     time.time() - max(last_pressed_ds2, last_released_ds2) > 5 and time.time() - last_correct_pin > 5):
-                with lock:
-                    is_alarm = True
-
+                alarm_set_on()
             if (last_released_ds1 > last_pressed_ds1 and
                     time.time() - max(last_pressed_ds1, last_released_ds1) > 5 and time.time() - last_correct_pin > 5):
-                with lock:
-                    is_alarm = True
+                alarm_set_on()
 
         time.sleep(1)
 
@@ -139,7 +152,7 @@ def check_safe_movement(data):
             if len(values) > 0:
                 diff = abs(values[0]["_value"] - data["value"])
                 if diff > 10:
-                    is_alarm = True
+                    alarm_set_on()
 
             point = (
                 Point("Alarm")
@@ -156,7 +169,7 @@ def rpir_raise_alarm():
             global is_alarm
             global in_house_count
             if in_house_count == 0:
-                is_alarm = True
+                alarm_set_on()
             point = (
                 Point("Alarm")
                 .tag("name", "triggered")
@@ -193,7 +206,7 @@ def handle_pin_input(pin):
             global is_alarm
             global security_timestamp
             if is_alarm:
-                is_alarm = False
+                alarm_set_off()
             if security_timestamp == 0:
                 with lock:
                     security_timestamp = time.time() + 10
@@ -261,7 +274,6 @@ def save_to_db(topic, data):
         print(e)
 
 
-
 @app.route('/api/devices/<pi_id>', methods=['GET'])
 @cross_origin()
 def get_devices(pi_id):
@@ -269,6 +281,7 @@ def get_devices(pi_id):
     data = settings.load_settings("../settings" + id + ".json")
     device_list = list(data.values())
     return device_list
+
 
 def handle_influx_query(query):
     try:
@@ -290,4 +303,4 @@ if __name__ == '__main__':
     ds_watchdog.daemon = True
     ds_watchdog.start()
 
-    app.run(debug=True,  port=8000)
+    app.run(debug=True, port=8000)

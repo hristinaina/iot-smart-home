@@ -12,8 +12,8 @@ def generate_values():
             length = random.randint(4, 8)
             for i in range(length):
                 code += keys[random.randint(0, len(keys) - 1)]
-            else:
-                code = pin
+        else:
+            code = pin
         yield code
 
 
