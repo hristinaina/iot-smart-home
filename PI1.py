@@ -1,5 +1,8 @@
+import json
 import multiprocessing
 import threading
+
+import paho.mqtt.client as mqtt
 
 from components.button import run_button
 from components.ms import run_ms
@@ -14,21 +17,55 @@ from components.buzzer import run_buzzer
 
 try:
     import RPi.GPIO as GPIO
+
     GPIO.setmode(GPIO.BCM)
 except:
     pass
 
+pi_light_pipe, light_pipe = multiprocessing.Pipe()
+
+mqtt_client = mqtt.Client()
+mqtt_client.connect("localhost", 1883, 0)
+mqtt_client.loop_start()
+
+buzzer_active = False
+
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe("pi1")
+
+
+mqtt_client.on_connect = on_connect
+mqtt_client.on_message = lambda client, userdata, msg: user_inputs(json.loads(msg.payload.decode('utf-8')))
+
 
 def menu():
-    print("="*10 + "  MENU  " + "="*10)
-    print("-- Enter DBA to activate buzzer --")
-    print("-- Enter DBD to deactivate buzzer --")
+    print("=" * 10 + "  MENU  " + "=" * 10)
+    print("-- Enter B to activate buzzer --")
+    print("-- Enter D to deactivate buzzer --")
+    print("-- Enter L to change light state --")
     print("-- Enter X to stop all devices --")
     print("=" * 30)
 
 
+def user_inputs(data):
+    global buzzer_active
+    if data["trigger"] == "B" and not buzzer_active:
+        buzzer_stop_event.clear()
+        run_buzzer(db_settings, threads, buzzer_stop_event)
+        buzzer_active = True
+    elif data["trigger"] == "D":
+        buzzer_stop_event.set()
+        buzzer_active = False
+    elif data["trigger"] == "X":
+        stop_event.set()
+        buzzer_stop_event.set()
+    elif data["trigger"] == "L":
+        pi_light_pipe.send("l")
+
+
 if __name__ == "__main__":
-    print('Starting app')
+    print('Starting PI1')
     menu()
     settings = load_settings()
     threads = []
@@ -54,21 +91,9 @@ if __name__ == "__main__":
         run_pir(dpir1_settings, threads, stop_event)
         run_button(ds1_settings, threads, stop_event)
         run_ms(ms_settings, threads, stop_event)
-        pi_light_pipe, light_pipe = multiprocessing.Pipe()
+
         run_light(light_pipe, settings['DL'], threads, stop_event)
 
-        while True:
-            user_input = input().strip().upper()
-            if user_input == "DBA":
-                buzzer_stop_event.clear()
-                run_buzzer(db_settings, threads, buzzer_stop_event)
-            elif user_input == "DBD":
-                buzzer_stop_event.set()
-            elif user_input == "X":
-                stop_event.set()
-                buzzer_stop_event.set()
-            elif user_input == "L":
-               pi_light_pipe.send("l")
 
     except KeyboardInterrupt:
         print('\nStopping app')
