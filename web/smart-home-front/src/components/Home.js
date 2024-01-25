@@ -4,7 +4,7 @@ import { Navigation } from './Navigation';
 import io from "socket.io-client";
 
 export function Home() {
-    const [showAlarm, setShowAlarm] = useState(localStorage.getItem('alarm'));
+    const [showAlarm, setShowAlarm] = useState(localStorage.getItem('alarm') == "true");
 
     useEffect(() => {
         const socket = io('http://localhost:8000');

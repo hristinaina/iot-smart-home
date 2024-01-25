@@ -18,7 +18,7 @@ export class Devices extends Component {
             isDMSDialogOpen: false,
             isBBDialogOpen: false,
             selectedDevice: null,
-            showAlarm: localStorage.getItem('alarm'),
+            showAlarm: localStorage.getItem('alarm') == "true",
         };
         this.pi = this.extractPIFromUrl();
         this.socket = null;
