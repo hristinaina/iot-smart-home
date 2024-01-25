@@ -4,7 +4,7 @@ import { Navigation } from './Navigation';
 import io from "socket.io-client";
 
 export function Home() {
-    const [showAlarm, setShowAlarm] = useState(false);
+    const [showAlarm, setShowAlarm] = useState(localStorage.getItem('alarm'));
 
     useEffect(() => {
         const socket = io('http://localhost:8000');
@@ -21,6 +21,7 @@ export function Home() {
             const message = msg.message
             console.log(message);
             setShowAlarm(message);
+            localStorage.setItem("alarm", message);
         });
         return () => {
             socket.disconnect();

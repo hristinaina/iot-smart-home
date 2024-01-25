@@ -18,7 +18,7 @@ export class Devices extends Component {
             isDMSDialogOpen: false,
             isBBDialogOpen: false,
             selectedDevice: null,
-            showAlarm: false,
+            showAlarm: localStorage.getItem('alarm'),
         };
         this.pi = this.extractPIFromUrl();
         this.socket = null;
@@ -82,6 +82,7 @@ export class Devices extends Component {
             const message = msg.message
             console.log(message);
             this.setState({showAlarm: message});
+            localStorage.setItem("alarm", message);
         });
 
 
