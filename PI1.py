@@ -25,8 +25,10 @@ except:
 pi_light_pipe, light_pipe = multiprocessing.Pipe()
 
 mqtt_client = mqtt.Client()
-mqtt_client.connect("localhost", 1883, 60)
+mqtt_client.connect("localhost", 1883, 0)
 mqtt_client.loop_start()
+
+buzzer_active = False
 
 
 def on_connect(client, userdata, flags, rc):
@@ -47,17 +49,19 @@ def menu():
 
 
 def user_inputs(data):
-    while True:
-        if data["trigger"] == "B":
-            buzzer_stop_event.clear()
-            run_buzzer(db_settings, threads, buzzer_stop_event)
-        elif data["trigger"] == "D":
-            buzzer_stop_event.set()
-        elif data["trigger"] == "X":
-            stop_event.set()
-            buzzer_stop_event.set()
-        elif data["trigger"] == "L":
-            pi_light_pipe.send("l")
+    global buzzer_active
+    if data["trigger"] == "B" and not buzzer_active:
+        buzzer_stop_event.clear()
+        run_buzzer(db_settings, threads, buzzer_stop_event)
+        buzzer_active = True
+    elif data["trigger"] == "D":
+        buzzer_stop_event.set()
+        buzzer_active = False
+    elif data["trigger"] == "X":
+        stop_event.set()
+        buzzer_stop_event.set()
+    elif data["trigger"] == "L":
+        pi_light_pipe.send("l")
 
 
 if __name__ == "__main__":

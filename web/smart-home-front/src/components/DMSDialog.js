@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import "./Dialog.css"
+import DeviceService from "../services/DeviceService";
 
 const DMSDialog = ({ open, onClose, device }) => {
   const [inputValue, setInputValue] = useState('');
@@ -15,11 +16,16 @@ const DMSDialog = ({ open, onClose, device }) => {
     setInputValue(event.target.value);
   };
 
-  const handleSave = () => {
-    console.log('Input value:', inputValue);
-    console.log(device);
-    // todo: inform back application about the change
-    onClose();
+  const handleSave = async () => {
+      console.log('Input value:', inputValue);
+      console.log(device);
+      try {
+          await DeviceService.inputPin(inputValue);
+      } catch (error) {
+          console.log("Error fetching data from the server");
+          console.log(error);
+      }
+      onClose();
   };
 
   return (

@@ -93,7 +93,7 @@ def buzzer_deactivated(publish_event, dht_settings, verbose=False):
 def run_buzzer(settings, threads, stop_event):
     if settings['simulated']:
         print("Starting {} simulator".format(settings["name"]))
-        buzzer_thread = threading.Thread(target=run_buzzer_simulator, args=(2, buzzer_activated, buzzer_deactivated,
+        buzzer_thread = threading.Thread(target=run_buzzer_simulator, args=(0.1, buzzer_activated, buzzer_deactivated,
                                                                             stop_event, publish_event, settings))
         buzzer_thread.start()
         threads.append(buzzer_thread)

@@ -36,8 +36,8 @@ correct_pin = "1234"
 security_timestamp = time.time()
 last_correct_pin = 0
 
-
 bb_alarm_time = "21:39"
+
 
 # Table names: Temperature, Humidity, PIR_motion, Button_pressed, Buzzer_active, Light_status, MS_password, UDS,
 #              Acceleration, Gyroscope, Infrared, Time_b4sd
@@ -45,19 +45,38 @@ bb_alarm_time = "21:39"
 #              data/acceleration, data/gyroscope, data/ir, data/b4sd
 
 def alarm_set_on():
-    with lock:
-        global is_alarm
-        is_alarm = True
-        mqtt_client.publish("pi1", json.dumps({"trigger": "B"}))
-        mqtt_client.publish("pi3", json.dumps({"trigger": "B"}))
+    with app.app_context():
+        with lock:
+            global is_alarm
+            is_alarm = True
+            mqtt_client.publish("pi1", json.dumps({"trigger": "B"}))
+            mqtt_client.publish("pi3", json.dumps({"trigger": "B"}))
+
+            point = (
+                Point("Alarm")
+                .tag("name", "triggered")
+                .field("Is_alarm", "on" if is_alarm else "off")
+            )
+        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+        write_api.write(bucket=bucket, org=org, record=point)
+        send_alarm_to_client()
 
 
 def alarm_set_off():
-    with lock:
-        global is_alarm
-        is_alarm = False
-        mqtt_client.publish("pi1", json.dumps({"trigger": "D"}))
-        mqtt_client.publish("pi3", json.dumps({"trigger": "D"}))
+    with app.app_context():
+        with lock:
+            global is_alarm
+            is_alarm = False
+            mqtt_client.publish("pi1", json.dumps({"trigger": "D"}))
+            mqtt_client.publish("pi3", json.dumps({"trigger": "D"}))
+            point = (
+                Point("Alarm")
+                .tag("name", "triggered")
+                .field("Is_alarm", "on" if is_alarm else "off")
+            )
+        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+        write_api.write(bucket=bucket, org=org, record=point)
+        send_alarm_to_client()
 
 
 @socketio.on('connect')
@@ -78,6 +97,15 @@ def send_data_to_client(data):
         print(e)
 
 
+def send_alarm_to_client():
+    global is_alarm
+    try:
+        socketio.emit('alarm', {'message': is_alarm})
+        print("Alarm sent to topic: alarm")
+    except Exception as e:
+        print(e)
+
+
 def on_connect(client, userdata, flags, rc):
     client.subscribe("data/+")
 
@@ -92,11 +120,9 @@ def ds_watchdog_function():
     global security_timestamp
     while True:
         if last_pressed_ds1 > 0 and time.time() - last_pressed_ds1 > 5 and last_released_ds1 <= last_pressed_ds1:
-            with lock:
-                alarm_set_on()
+            alarm_set_on()
         if last_pressed_ds2 > 0 and time.time() - last_pressed_ds2 > 5 and last_released_ds2 <= last_pressed_ds2:
-            with lock:
-                alarm_set_on()
+            alarm_set_on()
         if security_timestamp > time.time():
             if (last_released_ds2 > last_pressed_ds2 and
                     time.time() - max(last_pressed_ds2, last_released_ds2) > 5 and time.time() - last_correct_pin > 5):
@@ -149,36 +175,19 @@ def check_safe_movement(data):
                  '|> yield(name: "last")')
         response = handle_influx_query(query)
         values = json.loads(response.data.decode('utf-8'))['data']
-        with lock:
-            global is_alarm
-            if len(values) > 0:
-                diff = abs(values[0]["_value"] - data["value"])
-                if diff > 10:
-                    alarm_set_on()
-
-            point = (
-                Point("Alarm")
-                .tag("name", "triggered")
-                .field("Is_alarm", "on" if is_alarm else "off")
-            )
-        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
-        write_api.write(bucket=bucket, org=org, record=point)
+        global is_alarm
+        if len(values) > 0:
+            diff = abs(values[0]["_value"] - data["value"])
+            if diff > 10:
+                alarm_set_on()
 
 
 def rpir_raise_alarm():
     with app.app_context():
-        with lock:
-            global is_alarm
-            global in_house_count
-            if in_house_count == 0:
-                alarm_set_on()
-            point = (
-                Point("Alarm")
-                .tag("name", "triggered")
-                .field("Is_alarm", "on" if is_alarm else "off")
-            )
-        write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
-        write_api.write(bucket=bucket, org=org, record=point)
+        global is_alarm
+        global in_house_count
+        if in_house_count == 0:
+            alarm_set_on()
 
 
 def ds_adjust_time(data, device_number=1):
@@ -298,8 +307,8 @@ def handle_influx_query(query):
         return jsonify({"status": "success", "data": container})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
-    
-    
+
+
 @app.route('/api/updateRGB/<color>', methods=['GET'])
 @cross_origin()
 def update_rgb(color):
@@ -333,6 +342,20 @@ def set_alarm_clock():
         return jsonify({'message': 'Alarm time set successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/inputPin', methods=['PUT'])
+@cross_origin()
+def input_pin():
+    try:
+        data = request.json
+        pin = data.get('pin')
+        print("Pin entered: ", pin)
+        handle_pin_input(pin)
+        return jsonify({'message': 'Alarm time set successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/turnOffAlarmClock', methods=['GET'])
 @cross_origin()
