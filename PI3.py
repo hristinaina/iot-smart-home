@@ -18,6 +18,7 @@ from time import sleep
 
 try:
     import RPi.GPIO as GPIO
+
     GPIO.setmode(GPIO.BCM)
 except:
     pass
@@ -26,6 +27,7 @@ bb_alarm_time = "21:39"
 buzzer_stop_event = threading.Event()
 mqtt_client = mqtt.Client()
 
+
 def on_connect(client, userdata, flags, rc):
     client.subscribe("front-bb")
     client.subscribe("front-bb-off")
@@ -33,15 +35,14 @@ def on_connect(client, userdata, flags, rc):
 
 
 def user_inputs(data):
-    while True:
-        if data["trigger"] == "B":
-            buzzer_stop_event.clear()
-            run_buzzer(bb_settings, threads, buzzer_stop_event)
-        elif data["trigger"] == "D":
-            buzzer_stop_event.set()
-        elif data["trigger"] == "X":
-            stop_event.set()
-            buzzer_stop_event.set()
+    if data["trigger"] == "B":
+        buzzer_stop_event.clear()
+        run_buzzer(bb_settings, threads, buzzer_stop_event)
+    elif data["trigger"] == "D":
+        buzzer_stop_event.set()
+    elif data["trigger"] == "X":
+        stop_event.set()
+        buzzer_stop_event.set()
 
 
 def update_data(topic, data):
@@ -61,7 +62,8 @@ def connect_mqtt():
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.loop_start()
     mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = lambda client, userdata, msg: update_data(msg.topic, json.loads(msg.payload.decode('utf-8')))
+    mqtt_client.on_message = lambda client, userdata, msg: update_data(msg.topic,
+                                                                       json.loads(msg.payload.decode('utf-8')))
 
 
 def run_alarm_clock(bb_settings, threads, buzzer_stop_event):
@@ -86,9 +88,8 @@ def run_alarm_clock(bb_settings, threads, buzzer_stop_event):
         sleep(5)
 
 
-
 def menu():
-    print("="*10 + "  MENU  " + "="*10)
+    print("=" * 10 + "  MENU  " + "=" * 10)
     print("-- Enter B to activate buzzer --")
     print("-- Enter D to deactivate buzzer --")
     print("-- Enter X to stop all devices --")
