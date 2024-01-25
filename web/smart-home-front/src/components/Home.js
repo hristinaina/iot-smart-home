@@ -29,8 +29,15 @@ export function Home() {
 
 
     return (
-    <div>
-        <Navigation  showAlarm={showAlarm}></Navigation>
-    </div>
-  );
+        <div >
+            <Navigation showAlarm={showAlarm}></Navigation>
+
+                <iframe width = "100%" height = "900vh"
+                    src="http://localhost:3000/public-dashboards/b7417158c7d5433e91984caeb220d594"
+                     frameBorder="0"></iframe>
+
+        </div>
+
+    )
+        ;
 }

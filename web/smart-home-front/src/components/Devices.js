@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import React, {Component} from 'react';
 import './Devices.css';
 import {Navigation} from './Navigation';
 import DeviceService from '../services/DeviceService'
@@ -265,6 +265,7 @@ export class Devices extends Component {
     render() {
         const {data} = this.state;
         const showAlarm = this.state.showAlarm;
+        const pi = this.pi;
         return (
             <div>
                 <Navigation showAlarm={showAlarm}/>
@@ -281,6 +282,24 @@ export class Devices extends Component {
                           device={this.state.selectedDevice}/>
                 <DevicesList devices={data} openColorDialog={this.openColorDialog} openDMSDialog={this.openDMSDialog}
                              openBBDialog={this.openBBDialog}/>
+
+                {pi == "PI1" && (
+                    <iframe width="100%" height="900vh"
+                            src="http://localhost:3000/public-dashboards/cadd5c956624491e8e884353797a8e87"
+                            frameBorder="0"></iframe>
+                )}
+
+                {pi == "PI2" && (
+                    <iframe width="100%" height="900vh"
+                            src="http://localhost:3000/public-dashboards/f31875cca0404d4189ff1386d38d80b8"
+                            frameBorder="0"></iframe>
+                )}
+
+                {pi == "PI3" && (
+                    <iframe width="100%" height="900vh"
+                            src="http://localhost:3000/public-dashboards/9d3cb64e064a489fa2d8e2666c367a91"
+                            frameBorder="0"></iframe>
+                )}
             </div>
         )
     }
