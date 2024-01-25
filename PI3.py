@@ -27,6 +27,7 @@ bb_alarm_time = "21:39"
 buzzer_stop_event = threading.Event()
 mqtt_client = mqtt.Client()
 
+buzzer_active = False
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("front-bb")
@@ -35,11 +36,14 @@ def on_connect(client, userdata, flags, rc):
 
 
 def user_inputs(data):
-    if data["trigger"] == "B":
+    global buzzer_active
+    if data["trigger"] == "B" and not buzzer_active:
         buzzer_stop_event.clear()
         run_buzzer(bb_settings, threads, buzzer_stop_event)
+        buzzer_active = True
     elif data["trigger"] == "D":
         buzzer_stop_event.set()
+        buzzer_active = False
     elif data["trigger"] == "X":
         stop_event.set()
         buzzer_stop_event.set()

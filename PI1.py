@@ -28,6 +28,8 @@ mqtt_client = mqtt.Client()
 mqtt_client.connect("localhost", 1883, 0)
 mqtt_client.loop_start()
 
+buzzer_active = False
+
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("pi1")
@@ -47,11 +49,14 @@ def menu():
 
 
 def user_inputs(data):
-    if data["trigger"] == "B":
+    global buzzer_active
+    if data["trigger"] == "B" and not buzzer_active:
         buzzer_stop_event.clear()
         run_buzzer(db_settings, threads, buzzer_stop_event)
+        buzzer_active = True
     elif data["trigger"] == "D":
         buzzer_stop_event.set()
+        buzzer_active = False
     elif data["trigger"] == "X":
         stop_event.set()
         buzzer_stop_event.set()
