@@ -6,6 +6,7 @@ Project for course Internet of things (IOT).
 This project involves the use of sensors installed on three Raspberry Pis (or simulations if physical devices are unavailable) to monitor a smart home system.
 The application provides real-time status updates for each component in the house. It also triggers an alert/alarm if any component detects suspicious behavior.
 The photo below illustrates the house plan and the and the system implemented in this project:
+
 ![image](https://github.com/user-attachments/assets/f5ba61fd-b2b6-4940-aad2-764315164a64)
 
 ## Technologies Used
@@ -49,7 +50,7 @@ The backend is built with Python Flask, and the frontend is developed using Reac
 
 4. Run the Flask server by navigating to the 'backend' directory and running the next command:
    ```sh
-   python app.py
+   python server.py
    ```
 ### Frontend
 
