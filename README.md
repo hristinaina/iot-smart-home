@@ -1,7 +1,11 @@
 # Smart Home
-
-## Project Description
 Project for course Internet of things (IOT).
+
+## Team members
+- [Uroš Stanić](https://github.com/ili0n)
+- [Hristina Adamović](https://github.com/hristinaina)
+  
+## Project Description
 
 This project involves the use of sensors installed on three Raspberry Pis (or simulations if physical devices are unavailable) to monitor a smart home system.
 The application provides real-time status updates for each component in the house. It also triggers an alert/alarm if any component detects suspicious behavior.
